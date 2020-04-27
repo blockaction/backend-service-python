@@ -16,73 +16,129 @@ headers = {
     'accept': 'application/json',
 }
 
+def get_current_ethereum_price():
+    api = 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,JPY,EUR?1eef1b3afe86c87ccb9b43f6a7ed8c4483fc5076e99b0f8cecfcae04f054ec75'
+    response = requests.get(api)
+    if response.status_code == 200:
+        data =  parse_dictionary(response.content.decode('UTF-8'))    
+        price = data.get('USD')
+        return price
+    else:
+        return ('error in parsing eth price')
 
 def get_current_epoch():
-    return 1230
+    try:    
+        uri = '/eth/v1alpha1/beacon/chainhead'
+        url = base_url+uri
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.content.decode('UTF-8')    
+            data = ast.literal_eval(data)
+            return int(data.get('finalizedEpoch'))
+    except Exception as e:
+        print (e)
+        return send_error_msg()
+
 
 def send_error_msg(): 
     return jsonify({'error_msg':'no response from Prysm api'}), 505
 
-def send_sucess_msg(response):
-    return_data = ast.literal_eval(response)
-    return_data['message'] = 'Sucess'
-    return jsonify(return_data), 200
+def parse_dictionary(data):
+    return (ast.literal_eval(data))    
+    
+
+
+def send_sucess_msg(response,**kwargs):
+    if not type(response) ==  dict:
+        response = parse_dictionary(response)
+    response['message'] = 'Sucess'
+    for k,v in kwargs.items():
+        response[k] =  v
+    return jsonify(response), 200
 
 @app.route('/attestations')
 def get_attestations():
-    
-    '''
-    Retrieve attestations by block root, slot, or epoch.
-    An attestation is a validator’s vote, weighted by the validator’s balance.  
-    Attestations are broadcasted by validators in addition to blocks.
-    '''
+    try:
 
-    url = base_url+"/eth/v1alpha1/beacon/attestations"
-    current_epoch = str(get_current_epoch())
-    pageSize = 10
-    attestations = http.request(
-        'GET',
-        url,
-        fields={
-            'epoch' : current_epoch,
-            'pageSize' : pageSize 
-        } 
-    )
+        
+        '''
+        Retrieve attestations by block root, slot, or epoch.
+        An attestation is a validator’s vote, weighted by the validator’s balance.  
+        Attestations are broadcasted by validators in addition to blocks.
+        '''
 
-    if attestations.status == 200:
-        response = attestations.data.decode('UTF-8')
-        return send_sucess_msg(response)
-    else:
+        url = base_url+"/eth/v1alpha1/beacon/attestations"
+        current_epoch = str(get_current_epoch())
+        pageSize = 2
+        attestations = http.request(
+            'GET',
+            url,
+            fields={
+                'epoch' : current_epoch,
+                'pageSize' : pageSize 
+            } 
+        )
+
+        if attestations.status == 200:
+            response = attestations.data.decode('UTF-8')
+            additional_data = {
+                'defination' :'An attestation is a validator’s vote, weighted by the validator’s balance.  Attestations are broadcasted by validators in addition to blocks.'
+            }
+            return send_sucess_msg(response, **additional_data)
+        else:
+            return send_error_msg()
+    except Exception as e :
+        print(e)
         return send_error_msg()
+
 
 @app.route('/get_block_stream')
 def get_block_stream():
-    api = '/eth/v1alpha1/beacon/blocks/stream'
-    url = base_url+api
-    block_stream = requests.get(url,headers=headers)
-    print (block_stream)
+    try:
+        api = '/eth/v1alpha1/beacon/blocks/stream'
+        url = base_url+api
+        block_stream = requests.get(url,headers=headers)
+        print (block_stream)
+    except Exception as e :
+        print(e)
+        return send_error_msg()
 
 @app.route('/validators_queue')
 def get_validator_queue():
-    uri = '/eth/v1alpha1/validators/queue'
-    url = base_url+uri
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.content.decode('UTF-8')
-        return send_sucess_msg(data)
-    else:
+    try:
+        uri = '/eth/v1alpha1/validators/queue'
+        url = base_url+uri
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.content.decode('UTF-8')
+            data = parse_dictionary(data)
+            return_data = {
+                'public_keys' : data.get('activationPublicKeys'),
+                'count' : len(data)
+            } 
+            return send_sucess_msg(return_data)
+        else:
+            return send_error_msg()
+    except Exception as e :
+        print(e)
         return send_error_msg()
 
 @app.route('/beacon_configuration')
 def get_beacon_configuration():
-    uri = '​/eth​/v1alpha1​/beacon​/config'
-    url = base_url+uri
-    response = requests.get(url, headers=headers)
+    try:
 
-    if response.status_code == 200:
-        data = response.content.decode('UTF-8')
-        return send_sucess_msg(data)
-    else:
+        uri = '​/eth​/v1alpha1​/beacon​/config'
+        url = base_url+uri
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.content.decode('UTF-8')
+            return send_sucess_msg(data)
+        else:
+            return send_error_msg()
+
+    except Exception as e :
+        print(e)
         return send_error_msg()
 
 @app.route('/get_current_beacon_state')
@@ -96,8 +152,10 @@ def get_current_beacon_state():
             return send_sucess_msg(data)
         else:
             return send_error_msg()
-    except expression as identifier:
-        pass
+
+    except Exception as e :
+        print(e)
+        return send_error_msg()
 
 
 
@@ -109,15 +167,27 @@ def get_current_chain_state():
         response = requests.get(url)
         if response.status_code == 200:
             data = response.content.decode('UTF-8')
-            return send_sucess_msg(data)
+            data = parse_dictionary(data)
+            return_data = {
+                'epoch' : data.get('finalizedEpoch'),
+                'finalizedSlot' : data.get('finalizedSlot')
+            }
+            price = get_current_ethereum_price()
+
+            additional_data = {
+                'slot' : 'A slot is a chance for a block to be added to the Beacon Chain and shards. A slot is like the block time, but slots can be empty as well',
+                'epoch' : 'Epoch is collection of slots , basically 32 slots i.e 6.4 minutes form one epoch',
+                'price' : price
+            }
+
+            return send_sucess_msg(return_data, **additional_data)
         else:
             return send_error_msg()
-    except expression as identifier:
-        pass    
+    except Exception as e:
+        print (e)
 
 
 if __name__ == "__main__":
-    print (dir())
-    app.run(debug=True)
+    app.run(debug=True,host= '0.0.0.0')
 
 
