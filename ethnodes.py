@@ -200,7 +200,24 @@ def get_current_chain_state():
         print (e)
 
 
+@app.route('/validators/validators_list')
+def get_validators():
+    uri = '/eth/v1alpha1/validators'
+    url = base_url+uri
+    validators = http.request(
+        'GET',
+        url,
+        fields={
+            'epoch' : get_current_epoch()             
+        } 
+    )
 
+    if validators.status == 200:
+        validators =  json.loads(validators.data.decode('UTF-8'))
+        additional_data = {
+            'count' : len(validators.get('validatorList'))
+        }
+        return send_sucess_msg(validators, **additional_data)
 
 def node_peers():
     uri = '/eth/v1alpha1/node/peers'
