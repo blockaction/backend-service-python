@@ -6,9 +6,14 @@ import json
 import ast 
 from flask import jsonify
 import urllib3
+from flask_cors import CORS
+
+
 http = urllib3.PoolManager()
 
 app = Flask(__name__)
+CORS(app)
+
 
 
 base_url = "https://api.prylabs.net"
@@ -54,6 +59,7 @@ def send_sucess_msg(response,**kwargs):
     response['message'] = 'Sucess'
     for k,v in kwargs.items():
         response[k] =  v
+
     return jsonify(response), 200
 
 @app.route('/attestations')
@@ -123,7 +129,9 @@ def get_validator_queue():
         print(e)
         return send_error_msg()
 
-@app.route('/beacon_configuration')
+
+#not working
+@app.route('/beacon/beacon_configuration')
 def get_beacon_configuration():
     try:
 
@@ -141,7 +149,7 @@ def get_beacon_configuration():
         print(e)
         return send_error_msg()
 
-@app.route('/get_current_beacon_state')
+@app.route('/beacon/get_current_beacon_state')
 def get_current_beacon_state():
     try:
         uri = '/eth/v1alpha1/beacon/chainhead'
@@ -174,8 +182,6 @@ def get_current_chain_state():
             }
             price = get_current_ethereum_price()
             peers_data = node_peers()
-
-
 
 
             additional_data = {
