@@ -169,7 +169,7 @@ def get_current_chain_state():
             data = response.content.decode('UTF-8')
             data = parse_dictionary(data)
             return_data = {
-                'epoch' : data.get('finalizedEpoch'),
+                'finalizedEpoch' : data.get('finalizedEpoch'),
                 'finalizedSlot' : data.get('finalizedSlot')
             }
             price = get_current_ethereum_price()
@@ -179,9 +179,10 @@ def get_current_chain_state():
 
 
             additional_data = {
-                'slot' : 'A slot is a chance for a block to be added to the Beacon Chain and shards. A slot is like the block time, but slots can be empty as well',
-                'epoch' : 'Epoch is collection of slots , basically 32 slots i.e 6.4 minutes form one epoch',
+                'slot_defination' : 'A slot is a chance for a block to be added to the Beacon Chain and shards. A slot is like the block time, but slots can be empty as well',
+                'epoch_defination' : 'Epoch is collection of slots , basically 32 slots i.e 6.4 minutes form one epoch',
                 'price' : price,
+                'peers_defination' : 'Peers are a fundamental element of the network who host ledgers and smart contracts',
                 'peers_count' : len(peers_data.get('peers')),
                 'peers' : peers_data.get('peers')
             }
