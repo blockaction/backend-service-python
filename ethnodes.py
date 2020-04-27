@@ -75,7 +75,7 @@ def get_attestations():
 
         url = base_url+"/eth/v1alpha1/beacon/attestations"
         current_epoch = str(get_current_epoch())
-        pageSize = 2
+        pageSize = 10
         attestations = http.request(
             'GET',
             url,
@@ -230,5 +230,4 @@ def node_peers():
 
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')
-
 
