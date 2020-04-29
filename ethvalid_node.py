@@ -133,5 +133,4 @@ def validator_synced_stream():
 
 
 if __name__ == "__main__":
-    print (dir())
     app.run(debug=True)

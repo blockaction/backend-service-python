@@ -219,6 +219,7 @@ def get_validators():
         }
         return send_sucess_msg(validators, **additional_data)
 
+
 def node_peers():
     uri = '/eth/v1alpha1/node/peers'
     url = base_url+uri
@@ -226,6 +227,31 @@ def node_peers():
     if response.status_code == 200:
         data = response.content.decode('UTF-8')
         return parse_dictionary(data)
+
+
+@app.route('/node/genesis')
+def node_genesis():
+    uri = '/eth/v1alpha1/node/genesis'
+    url = base_url+uri
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.content.decode('UTF-8')
+        return send_sucess_msg(data)
+    else:
+        return send_error_msg()
+
+
+@app.route('/node/version')
+def node_version():
+    # uri = 'eth/v1alpha1/node/version'
+    url = 'https://api.prylabs.net/eth/v1alpha1/node/version'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.content.decode('UTF-8')
+        return send_sucess_msg(data)
+    else:
+        return send_error_msg()
+
 
 
 if __name__ == "__main__":
