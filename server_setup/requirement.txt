@@ -1,0 +1,11 @@
+git+https://gitlab.com/mcs-python-base/common/mcs-common-service.git@22dfe517bd7181ce0fd97cc38f86ba6b2d974434
+git+https://gitlab.com/mcs-python-base/common/mcs-protos.git@b2d33ecdaa0e61b1540c0526464912c31f1b5b5a
+grpcio==1.27.2
+grpcio-tools==1.26.0
+marshmallow==3.4.0
+mysqlclient==1.4.2.post1
+protobuf==3.11.3
+psycopg2==2.8.4
+pymongo==3.4.0
+redis==3.4.1
+six==1.14.0
