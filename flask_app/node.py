@@ -14,3 +14,5 @@ def node_peers():
     if response.status_code == 200:
         data = response.content.decode('UTF-8')
         return common.parse_dictionary(data)
+    else:
+        return {}

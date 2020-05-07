@@ -8,6 +8,8 @@ import chardet
 import urllib3
 http = urllib3.PoolManager()
 import sys,os 
+import base64
+
 
 base_url = "https://api.prylabs.net"
 
@@ -55,7 +57,9 @@ def list_validators_grpc():
             single_data =  data.validator
             data_dist = dict()
 
-            data_dist['public_key'] = str(single_data.public_key)
+            pk = single_data.public_key
+
+            data_dist['public_key'] = common.decode_public_key(pk)
             data_dist['effective_balance'] = single_data.effective_balance
             validator_list.append(data_dist)
         
@@ -63,6 +67,9 @@ def list_validators_grpc():
             
     except Exception as e :
         print (e)
+
+
+
 
 
 def get_validators_api():
@@ -81,6 +88,12 @@ def get_validators_api():
         additional_data = {
             'count' : len(validators.get('validatorList'))
         }
+        pk = validators.get('validatorList')[0]
+        pk = dict(pk.get('validator'))
+        print (pk)
+        pk = pk.get('publicKey')
+        pk = common.decode_public_key(pk)
+        print (pk)
         return common.send_sucess_msg(validators, **additional_data)
     
 
