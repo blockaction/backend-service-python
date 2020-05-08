@@ -158,3 +158,55 @@ def get_validator_participation():
         return_data.append(return_dict)
 
     return common.send_sucess_msg({'data':return_data})
+
+
+# Validator info  by Publick Key
+
+
+def get_validators_detail(publicKey):
+    uri = '/eth/v1alpha1/validator/status'
+    url = base_url+uri
+    validators = http.request(
+        'GET',
+        url,
+        fields={
+            'publicKey' : publicKey            
+        } 
+    )
+
+    if validators.status == 200:
+        status_data = validators.data.decode('UTF-8')
+        status_data = common.parse_dictionary(status_data)
+        return_data = {
+            'status' : status_data.get('status'),
+            'activationEpoch' : status_data.get('activationEpoch')
+        }
+        
+        uri = '/eth/v1alpha1/validators/balances'
+        url = base_url+uri
+
+        response = http.request(
+            'GET',
+            url,
+            fields={
+                'publicKeys' : publicKey
+            } 
+        )
+
+        if response.status == 200:
+            balance_data = response.data.decode('UTF-8')
+            balance_data = common.parse_dictionary(balance_data).get('balances')
+            balance_data = balance_data[0]
+
+            balance =  int(balance_data.get('balance'))/9000000000
+            balance = str(round(balance, 2)) +" ETH"
+
+            index = balance_data.get('index')
+
+        
+            return_data['balance'] = balance
+            return_data['index'] = index
+
+            return common.send_sucess_msg(return_data)
+    else:
+        return common.send_error_msg()
