@@ -3,7 +3,8 @@ import models
 import common
 import json 
 
-base_url = "https://api.prylabs.net"
+base_url = common.api()
+
 uri = '/eth/v1alpha1/validators/participation'
 
 url = base_url+uri

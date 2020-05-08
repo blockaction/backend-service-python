@@ -27,8 +27,8 @@ def get_current_beacon_state():
 
 @app.route('/validators/validators_list')
 def get_validators():
-    # return beacon.get_validators_api()
-    return beacon.list_validators_grpc()
+    return beacon.get_validators_api()
+    # return beacon.list_validators_grpc()
 
 
 

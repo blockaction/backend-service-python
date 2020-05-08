@@ -11,8 +11,8 @@ import sys,os
 import base64
 
 
-base_url = "https://api.prylabs.net"
 
+base_url = common.api()
 
 def get_current_chain_state():
     try:
@@ -88,14 +88,15 @@ def get_validators_api():
         additional_data = {
             'count' : len(validators.get('validatorList'))
         }
-        pk = validators.get('validatorList')[0]
-        pk = dict(pk.get('validator'))
-        print (pk)
-        pk = pk.get('publicKey')
-        pk = common.decode_public_key(pk)
-        print (pk)
+        # pk = validators.get('validatorList')[0]
+        # pk = dict(pk.get('validator'))
+        # print (pk)
+        # pk = pk.get('publicKey')
+        # pk = common.decode_public_key(pk)
+        # print (pk)
         return common.send_sucess_msg(validators, **additional_data)
     
+
 
 def get_validator_queue():
 

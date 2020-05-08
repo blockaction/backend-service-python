@@ -1,6 +1,9 @@
 import requests
 from flask_app import common
-base_url = "https://api.prylabs.net"
+
+
+base_url = common.api()
+
 headers = {
     'accept': 'application/json',
 }

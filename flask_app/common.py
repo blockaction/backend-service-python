@@ -4,6 +4,12 @@ import ast
 import base64
 import re
 
+def api():
+    # base_url = "https://api.prylabs.net"
+    base_url = 'http://54.243.16.45:4001'
+    return base_url
+
+
 def send_error_msg(): 
     return jsonify({'error_msg':'no response from Prysm api'}), 505
 
@@ -47,10 +53,14 @@ def get_error_traceback(sys, e):
 
 
 import binascii
+from client import client_validators
 
-def decode_public_key(data_, altchars=b'+/'):
-    hex_data = binascii.hexlify(data_)
-    data = binascii.a2b_base64(hex_data)
+def decode_public_key(pk, altchars=b'+/'):
+    # hex_data = binascii.hexlify(data_)
+    # data = binascii.a2b_base64(hex_data)
 
+    # print (data)
+
+    data = client_validators.decode_public_key(pk)
     print (data)
-
+    return data

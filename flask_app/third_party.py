@@ -2,7 +2,9 @@ import requests
 from flask_app import common
 import ast 
 
-base_url = "https://api.prylabs.net"
+
+base_url = common.api()
+
 def get_current_ethereum_price():
     api = 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,JPY,EUR?1eef1b3afe86c87ccb9b43f6a7ed8c4483fc5076e99b0f8cecfcae04f054ec75'
     response = requests.get(api)
