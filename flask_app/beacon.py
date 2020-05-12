@@ -9,7 +9,7 @@ import urllib3
 http = urllib3.PoolManager()
 import sys,os 
 import base64
-
+import request 
 
 
 base_url = common.api()
@@ -72,8 +72,8 @@ def list_validators_grpc():
 
 
 
-def get_validators_api():
-    pageToken = request.args.get("page", "")
+def get_validators_api(args):
+    pageToken = args.get("page", "1")
     uri = '/eth/v1alpha1/validators'
     url = base_url+uri
     pageSize = 10
@@ -124,9 +124,9 @@ def get_validator_queue():
 
 
 
-def get_attestations():
+def get_attestations(args):
     try:
-        pageToken = request.args.get("page", "")
+        pageToken = args.get("page", "1")
         url = base_url+"/eth/v1alpha1/beacon/attestations"
         current_epoch = str(third_party.get_current_epoch())
         pageSize = 10

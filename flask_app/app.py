@@ -13,6 +13,7 @@ from flask import jsonify
 from flask_cors import CORS
 from flask_app import beacon
 from flask_app import validator
+from flask import request
 
 
 
@@ -27,7 +28,7 @@ def get_current_beacon_state():
 
 @app.route('/validators/validators_list')
 def get_validators():
-    return beacon.get_validators_api()
+    return beacon.get_validators_api(request.args)
     # return beacon.list_validators_grpc()
 
 
@@ -39,7 +40,7 @@ def get_validator_queue():
 
 @app.route('/attestations')
 def get_attestations():
-    return beacon.get_attestations()
+    return beacon.get_attestations(request.args)
 
 
 @app.route('/get_validator_participation')
