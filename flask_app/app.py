@@ -47,13 +47,13 @@ def get_graph_data():
     return beacon.get_validator_participation()
 
 @app.route('/validator/info/<publicKey>')
-def get_validator_details(publicKey):
-    return beacon.get_validators_detail(publicKey)
+def get_validators_detail_by_public_key(publicKey):
+    return beacon.get_validators_detail_by_public_key(publicKey)
 
 
 @app.route('/getinfo/<data>')
 def get_info(data):
-    return beacon.get_validators_detail(publicKey)
+    return beacon.searchable_data(data)
 
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')

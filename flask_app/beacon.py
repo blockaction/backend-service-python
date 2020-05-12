@@ -174,10 +174,12 @@ def get_validator_participation():
     return common.send_sucess_msg({'data':return_data})
 
 
-# Validator info  by Publick Key
 
 
-def get_validators_detail(pubkeyHex):
+def get_validators_detail_by_public_key(pubkeyHex):
+    '''
+        Validator info  by Publick Key
+    '''
     uri = '/eth/v1alpha1/validator/status'
     url = base_url+uri
     pubkeyB64 = str(common.encode_pubic_key(pubkeyHex[2::]).decode('utf-8'))
@@ -227,7 +229,14 @@ def get_validators_detail(pubkeyHex):
         return common.send_error_msg()
 
 
+def searchable_data(data):
+    try: 
+        check_data = data[:2]
+        if check_data == '0x':
+            return get_validators_detail_by_public_key(data)
 
-def get_info(data):
-    pass 
-    
+
+
+
+    except Exception as e:
+        pass 
