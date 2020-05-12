@@ -9,7 +9,6 @@ import urllib3
 http = urllib3.PoolManager()
 import sys,os 
 import base64
-import request 
 
 
 base_url = common.api()
