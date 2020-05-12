@@ -91,12 +91,21 @@ def get_validators_api(args):
         additional_data = {
             'count' : len(validators.get('validatorList'))
         }
+
+        validators_list = validators.get('validatorList')
+        for data in validators_list:
+            pk = dict(data.get('validator'))
+            pkB64 = pk.get('publicKey')
+            pkHex = common.decode_public_key(pkB64)
+            pk['publicKey'] = pkHex
+            data['validator'] = pk
+
         # pk = validators.get('validatorList')[0]
         # pk = dict(pk.get('validator'))
-        # print (pk)
-        # pk = pk.get('publicKey')
-        # pk = common.decode_public_key(pk)
-        # print (pk)
+        # pkB64 = pk.get('publicKey')
+        # pkHex = common.decode_public_key(pkB64)
+
+
         return common.send_sucess_msg(validators, **additional_data)
     
 
@@ -168,14 +177,15 @@ def get_validator_participation():
 # Validator info  by Publick Key
 
 
-def get_validators_detail(publicKey):
+def get_validators_detail(pubkeyHex):
     uri = '/eth/v1alpha1/validator/status'
     url = base_url+uri
+    pubkeyB64 = str(common.encode_pubic_key(pubkeyHex[2::]).decode('utf-8'))
     validators = http.request(
         'GET',
         url,
         fields={
-            'publicKey' : publicKey            
+            'publicKey' : pubkeyB64            
         } 
     )
 
@@ -194,7 +204,7 @@ def get_validators_detail(publicKey):
             'GET',
             url,
             fields={
-                'publicKeys' : publicKey
+                'publicKeys' : pubkeyB64
             } 
         )
 
@@ -215,3 +225,9 @@ def get_validators_detail(publicKey):
             return common.send_sucess_msg(return_data)
     else:
         return common.send_error_msg()
+
+
+
+def get_info(data):
+    pass 
+    

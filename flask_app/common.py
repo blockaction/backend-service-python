@@ -37,30 +37,19 @@ def get_error_traceback(sys, e):
 
 
 
-
-# def decode_public_key(pk):
-
-    
-#     pk =  pk.encode('ascii')
-#     if type(pk) == 'bytes':
-#         pk = base64.decodebytes(pk)
-#         return pk
-#     else:
-#         pk = base64.decodestring(pk)
-#         t = type(pk)
-#         return pk
+def decode_public_key(pubkeyB64):
+    '''
+        decode base64 to hex format
+    '''
+    pubkeyBytes = base64.b64decode(pubkeyB64)
+    pubkeyHex = pubkeyBytes.hex()   
+    return '0x'+pubkeyHex
 
 
-
-import binascii
-from client import client_validators
-
-def decode_public_key(pk, altchars=b'+/'):
-    # hex_data = binascii.hexlify(data_)
-    # data = binascii.a2b_base64(hex_data)
-
-    # print (data)
-
-    data = client_validators.decode_public_key(pk)
-    print (data)
-    return data
+def encode_pubic_key(pubkeyHex):
+    ''' 
+        encode hex key to base64 pubkey
+    '''
+    pubkeybytes = bytes.fromhex(pubkeyHex)
+    pubkeyB64  = base64.b64encode(pubkeybytes)
+    return pubkeyB64

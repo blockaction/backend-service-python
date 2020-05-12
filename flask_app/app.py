@@ -29,7 +29,6 @@ def get_current_beacon_state():
 @app.route('/validators/validators_list')
 def get_validators():
     return beacon.get_validators_api(request.args)
-    # return beacon.list_validators_grpc()
 
 
 
@@ -49,6 +48,11 @@ def get_graph_data():
 
 @app.route('/validator/info/<publicKey>')
 def get_validator_details(publicKey):
+    return beacon.get_validators_detail(publicKey)
+
+
+@app.route('/getinfo/<data>')
+def get_info(data):
     return beacon.get_validators_detail(publicKey)
 
 if __name__ == "__main__":
