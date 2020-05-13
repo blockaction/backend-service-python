@@ -1,7 +1,7 @@
 import requests
 from flask_app import common
 import ast 
-
+from flask_app import common
 
 base_url = common.api()
 
@@ -28,3 +28,7 @@ def get_current_epoch():
     except Exception as e:
         print (e)
         return common.send_error_msg()
+
+def send_current_eth_price():
+    price = get_current_ethereum_price()
+    return common.send_sucess_msg({'price' :price})

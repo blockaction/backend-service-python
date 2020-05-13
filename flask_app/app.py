@@ -11,7 +11,7 @@ import ast
 from flask import jsonify
 
 from flask_cors import CORS
-from flask_app import beacon
+from flask_app import beacon, third_party, common
 from flask_app import validator
 from flask import request
 
@@ -47,13 +47,17 @@ def get_graph_data():
     return beacon.get_validator_participation()
 
 @app.route('/validator/info/<publicKey>')
-def get_validators_detail_by_public_key(publicKey):
+def get_validators_detail_by_public_kehiy(publicKey):
     return beacon.get_validators_detail_by_public_key(publicKey)
 
 
 @app.route('/getinfo/<data>')
 def get_info(data):
     return beacon.searchable_data(data)
+
+@app.route('/get_eth_price')
+def get_eth_price():
+    return third_party.send_current_eth_price()
 
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')
