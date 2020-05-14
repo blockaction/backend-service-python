@@ -6,6 +6,8 @@ import models
 import common
 import json 
 import datetime
+import schedule
+import time
 
 
 sys.path.insert(0, abspath(join(dirname(__file__), '../')))
@@ -37,6 +39,7 @@ def global_participation_script():
     if data:
         participation = data.get('participation')
         insert_data = {
+            'epoch' : data.get('epoch'),
             'voted_ether' : participation.get('votedEther'),
             'global_participation' : participation.get('globalParticipationRate'),
             'eligible_ether' : participation.get('eligibleEther'),
@@ -49,4 +52,8 @@ def global_participation_script():
         False
 
 
-global_participation_script()
+schedule.every(2).minutes.do(global_participation_script)
+
+while True:
+    schedule.run_pending()
+    time.sleep(10)

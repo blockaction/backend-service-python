@@ -3,7 +3,8 @@ import google
 
 from mcs_protos import beacon_chain_pb2, beacon_chain_pb2_grpc
 from google.protobuf import empty_pb2
-from client import client_validators
+from client import client_validators,client_conf
+
 
 def get_empty_data():
     return empty_pb2.Empty(
@@ -12,7 +13,7 @@ def get_empty_data():
 
 def GetChainHead():
     try:    
-        with grpc.insecure_channel('54.243.16.45:4000') as channel:
+        with grpc.insecure_channel(client_conf.server_address()) as channel:
             stub = beacon_chain_pb2_grpc.BeaconChainStub(channel)
             response = stub.GetChainHead(get_empty_data())
             return response
@@ -23,7 +24,7 @@ def GetChainHead():
 
 def list_validators():
     try:    
-        with grpc.insecure_channel('54.243.16.45:4000') as channel:
+        with grpc.insecure_channel(client_conf.server_address()) as channel:
             stub = beacon_chain_pb2_grpc.BeaconChainStub(channel)
             response = stub.ListValidators(
                 beacon_chain_pb2.ListValidatorsRequest(
