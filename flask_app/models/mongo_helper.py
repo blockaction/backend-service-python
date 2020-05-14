@@ -7,9 +7,3 @@ def mongo_conn():
     except Exception as e: 
         print ("Mongo connection Error")
 
-
-
-def insert_into_mongo(collection_name, data_dictionary):
-    db_con = mongo_conn()
-    status = db_con.collection_name.insert(data)
-    print (status)

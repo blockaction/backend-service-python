@@ -342,10 +342,10 @@ def get_slot_data(slot):
 
 def get_participation_rate():
     ''' 
-        gives the global participation rate as per the db
+        gives the global participation rate as per the db for past 24 hr
     '''
     try:
-        pass 
+        db_con = mongo_helper.mongo_conn()
 
     except Exception as e :
         print (e)

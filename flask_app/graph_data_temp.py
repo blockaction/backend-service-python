@@ -19,7 +19,9 @@ base_url = common.api()
 
 
 
-def global_participation_script():
+
+
+def global_participation_temp():
     print ("#"*30)
     print("Executing global_participation_script")
     data = beacon.get_participation_rate()
@@ -31,15 +33,14 @@ def global_participation_script():
             'global_participation' : participation.get('globalParticipationRate'),
             'eligible_ether' : participation.get('eligibleEther'),
             'timestamp' : common.get_current_date_time()
-        }    
+        }
         db_con = mongo_helper.mongo_conn()
-        db_status = db_con.global_participation.insert(insert_data)
+        db_status = db_con.global_participation_temp.insert(insert_data)
         print (db_status)
     else:
         False
 
-schedule.every().hour.do(global_participation_script)
-
+schedule.every(5).minutes.do(global_participation_temp)
 
 while True:
     print ("*"*30)
