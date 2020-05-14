@@ -355,7 +355,6 @@ def get_participation_rate():
             data =  json.loads(response.data.decode('utf-8'))
             return data
 
-
     except Exception as e :
         print (e)
-        pass 
+        pass

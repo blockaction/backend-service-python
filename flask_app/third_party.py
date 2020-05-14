@@ -2,6 +2,7 @@ import requests
 from flask_app import common
 import ast 
 from flask_app import common
+from flask_app.models import mongo_helper
 
 base_url = common.api()
 
@@ -32,3 +33,30 @@ def get_current_epoch():
 def send_current_eth_price():
     price = get_current_ethereum_price()
     return common.send_sucess_msg({'price' :price})
+
+
+
+def get_data_for_global_participation_rate():
+    try:
+        db_con = mongo_helper.mongo_conn()
+        db_data = db_con.global_participation_temp.find({}).sort([('_id',1)]).limit(24)
+
+        timestamp_list = []
+        voted_ether_list = []
+        global_participation_list = []
+
+        for data in db_data:
+            timestamp_list.append(data.get('timestamp'))
+            voted_ether_list.append(data.get('voted_ether')+' ETH')
+            global_participation_list.append(round(data.get('global_participation')*100,2))
+
+        return_dict = {
+            'timestamp' : timestamp_list,
+            'voted_ether' : voted_ether_list,
+            'global_participation' : global_participation_list
+        }
+        return common.send_sucess_msg(return_dict)
+
+    except Exception as e :
+        print (e)
+        pass

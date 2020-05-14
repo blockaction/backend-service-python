@@ -40,7 +40,7 @@ def global_participation_temp():
     else:
         False
 
-schedule.every(5).minutes.do(global_participation_temp)
+schedule.every(1).minutes.do(global_participation_temp)
 
 while True:
     print ("*"*30)

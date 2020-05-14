@@ -70,8 +70,7 @@ def get_epoch_data(epoch_number):
 
 @app.route('/get_participation_rate')
 def get_participation_rate():
-    return beacon.get_participation_rate()
-
+    return third_party.get_data_for_global_participation_rate()
 
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')
