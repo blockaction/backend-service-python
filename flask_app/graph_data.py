@@ -17,24 +17,11 @@ from flask_app.models import redis_helper,mongo_helper
 
 base_url = common.api()
 
-# uri = '/eth/v1alpha1/validators/participation'
-
-# url = base_url+uri
-# response  = requests.get(url)
-# if response.status_code == 200:
-#     data = json.loads(response.content.decode('UTF-8'))
-    
-#     epoch = str(data.get('epoch'))
-#     voted_ether = int(data.get('participation').get('votedEther'))/1000000000
-#     store_data = {
-#         'epoch': epoch+' Epoch',
-#         'ether': voted_ether
-#     }
-#     db_con = models.mongo_conn()
-#     db_con.graph_data.insert(store_data)
 
 
 def global_participation_script():
+    print ("#"*30)
+    print("Executing global_participation_script")
     data = beacon.get_participation_rate()
     if data:
         participation = data.get('participation')
@@ -52,8 +39,10 @@ def global_participation_script():
         False
 
 
-schedule.every(2).minutes.do(global_participation_script)
+schedule.every(60).minutes.do(global_participation_script)
 
 while True:
+    print ("*"*30)
+    print ('Running python shedular for graph data')
     schedule.run_pending()
     time.sleep(10)

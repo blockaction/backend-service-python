@@ -342,19 +342,10 @@ def get_slot_data(slot):
 
 def get_participation_rate():
     ''' 
-        gives the global participation rate
+        gives the global participation rate as per the db
     '''
     try:
-        uri = '/eth/v1alpha1/validators/participation'
-        url = base_url+uri
-        response = http.request(
-            'GET',
-            url
-        )
-        if response.status == 200:
-            data =  json.loads(response.data.decode('utf-8'))
-            return data
-
+        pass 
 
     except Exception as e :
         print (e)
