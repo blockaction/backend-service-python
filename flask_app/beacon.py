@@ -1,7 +1,8 @@
 from .import third_party
 from .import node
 from client import client_beacon_chain
-from flask_app import common, models
+from flask_app import common 
+from flask_app.models import mongo_helper
 import json 
 import requests
 import chardet
@@ -162,7 +163,7 @@ def get_attestations(args):
 
 
 def get_validator_participation():
-    db =  models.mongo_conn()
+    db =  mongo_helper.mongo_conn()
     data = db.graph_data.find({}).limit(10)
     return_data = []
     for d in data :
@@ -235,8 +236,126 @@ def searchable_data(data):
         if check_data == '0x':
             return get_validators_detail_by_public_key(data)
 
-
-
-
     except Exception as e:
+        pass 
+
+
+def get_epoch_data(epoch_number):
+    uri = '/eth/v1alpha1/validators/participation'
+    url = base_url+uri
+    response = http.request(
+        'GET',
+        url,
+        fields={
+            'epoch_number' : str(epoch_number)           
+        } 
+    )
+
+    if response.status_code == 200:
+        data = json.loads(response.content.decode('UTF-8'))        
+        epoch = (data.get('epoch'))
+        finalized = str(data.get('finalized'))
+        voted_ether = int(data.get('participation').get('votedEther'))/1000000000
+        participation_rate = int(data.get('participation').get('globalParticipationRate'))
+        eligible_ether = int(data.get('participation').get('eligibleEther'))/1000000000
+        # validtor quee lenth
+        return_data = {
+            'epoch': epoch,
+            'finalized' :finalized,
+            'voted_ether': str(voted_ether)+' ETH',
+            'participation_rate' : str(participation_rate),
+            'eligible_ether' : str(eligible_ether)+ ' Eligible Ether '
+        }
+
+        #  Total Validator Count
+        uri = '/eth/v1alpha1/validators'
+        url = base_url+uri
+        validators = http.request(
+            'GET',
+            url,
+            fields={
+                'epoch' : epoch_number                         
+            } 
+        )
+
+        if validators.status == 200:
+            validators =  json.loads(validators.data.decode('UTF-8'))
+            total_data = {
+                'total_validator_count' : str(validators.get('totalSize'))
+            }
+
+       #  Pending Count
+        uri = '/eth/v1alpha1/validators/queue'
+        url = base_url+uri
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.content.decode('UTF-8')
+            data = common.parse_dictionary(data)
+            pending_data = {
+
+                'pending_count' : str(len(data.get('activationPublicKeys')))
+            } 
+            
+        return common.send_sucess_msg(return_data, **pending_data, **total_data)
+    else:
+        return common.send_error_msg()
+
+
+
+
+# data from slot Number
+
+def get_slot_data(slot):
+    uri = '/eth/v1alpha1/beacon/blocks'
+    url = base_url+uri
+    response = http.request(
+        'GET',
+        url,
+        fields={
+            'slot' : slot          
+        } 
+    )
+
+    if response.status == 200:
+        slot_data = response.data.decode('UTF-8')
+        slot_data = common.parse_dictionary(slot_data)
+        return_data = {
+            'slotNumber' : slot,
+            'ParentRootHas' : slot_data['blockContainers'][0]['block']['block']['parentRoot'],
+            'proposer' : slot_data['blockContainers'][0]['block']['block']['proposerIndex'],
+            'stateRoot' : slot_data['blockContainers'][0]['block']['block']['stateRoot'],
+            'signature' : slot_data['blockContainers'][0]['block']['signature'],
+            'blockRoot' : slot_data['blockContainers'][0]['blockRoot'],
+            'graffiti' : slot_data['blockContainers'][0]['block']['block']['body']['graffiti'],
+            'randaoReveal' : slot_data['blockContainers'][0]['block']['block']['body']['randaoReveal'],
+            'Eth_1_Block_Hash' :  slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['blockHash'],
+            'Eth_1_Deposit_Count' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositCount'],
+            'Eth_1_Deposit_Root' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositRoot']
+        }
+        
+        return common.send_sucess_msg(return_data)
+    else:
+        return common.send_error_msg()
+
+
+
+
+def get_participation_rate():
+    ''' 
+        gives the global participation rate
+    '''
+    try:
+        uri = '/eth/v1alpha1/validators/participation'
+        url = base_url+uri
+        response = http.request(
+            'GET',
+            url
+        )
+        if response.status == 200:
+            data =  json.loads(response.data.decode('utf-8'))
+            return data
+
+
+    except Exception as e :
+        print (e)
         pass 

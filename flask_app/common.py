@@ -1,12 +1,24 @@
-import os
+import os, sys
 from flask import jsonify
 import ast 
 import base64
 import re
+import configparser
+from datetime import datetime
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+conf_file_path = BASE_DIR+'/configuration.ini'
+config = configparser.RawConfigParser()
+config.read(conf_file_path)
+
+def get_config():
+    return config
+
 
 def api():
     # base_url = "https://api.prylabs.net"
-    base_url = 'http://54.243.16.45:4001'
+    base_url = 'http://3.89.9.40:4001'
     return base_url
 
 
@@ -53,3 +65,22 @@ def encode_pubic_key(pubkeyHex):
     pubkeybytes = bytes.fromhex(pubkeyHex)
     pubkeyB64  = base64.b64encode(pubkeybytes)
     return pubkeyB64
+
+def get_current_epoch():
+    try:    
+        uri = '/eth/v1alpha1/beacon/chainhead'
+        url = base_url+uri
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.content.decode('UTF-8')
+            data = ast.literal_eval(data)
+            return int(data.get('finalizedEpoch'))
+    except Exception as e:
+        print (e)
+        return False
+
+def get_current_date_time():
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    return dt_string 
+

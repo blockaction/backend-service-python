@@ -59,5 +59,19 @@ def get_info(data):
 def get_eth_price():
     return third_party.send_current_eth_price()
 
+@app.route('/slot/<slot>')
+def get_slot_data(slot):
+    return beacon.get_slot_data(slot)
+
+@app.route('/epoch/<epoch_number>')
+def get_epoch_data(epoch_number):
+    return beacon.get_epoch_data(epoch_number)
+
+
+@app.route('/get_participation_rate')
+def get_participation_rate():
+    return beacon.get_participation_rate()
+
+
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')
