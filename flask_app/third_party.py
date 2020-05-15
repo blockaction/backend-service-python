@@ -32,6 +32,20 @@ def get_current_epoch():
         print (e)
         return common.send_error_msg()
 
+
+def get_current_slot():
+    try:    
+        uri = '/eth/v1alpha1/beacon/chainhead'
+        url = base_url+uri
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.content.decode('UTF-8')    
+            data = ast.literal_eval(data)
+            return int(data.get('finalizedSlot'))
+    except Exception as e:
+        print (e)
+        return common.send_error_msg()
+
 def send_current_eth_price():
     price = get_current_ethereum_price()
     return common.send_sucess_msg({'price' :price})

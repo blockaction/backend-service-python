@@ -81,7 +81,7 @@ def get_validators_api(args):
         'GET',
         url,
         fields={
-            'epoch' : third_party.get_current_epoch(),
+            'slot' : third_party.get_current_slot(),
             'pageToken' : pageToken,
             'pageSize' : pageSize
         } 
@@ -150,7 +150,13 @@ def get_attestations(args):
         )
 
         if attestations.status == 200:
-            response = attestations.data.decode('UTF-8')
+            response = json.loads(attestations.data.decode('UTF-8'))
+            attestation_list = response.get('attestations')
+            for data in attestation_list:
+                blockchain_data = data.get('data')
+                blockchain_data['beaconBlockRoot'] = common.decode_public_key(blockchain_data.get('beaconBlockRoot'))
+                data['data'] = blockchain_data
+
             additional_data = {
                 'defination' :'An attestation is a validator’s vote, weighted by the validator’s balance.  Attestations are broadcasted by validators in addition to blocks.'
             }
