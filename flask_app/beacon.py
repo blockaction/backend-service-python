@@ -321,16 +321,16 @@ def get_slot_data(slot):
         slot_data = common.parse_dictionary(slot_data)
         return_data = {
             'slotNumber' : slot,
-            'ParentRootHas' : slot_data['blockContainers'][0]['block']['block']['parentRoot'],
+            'ParentRootHas' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['parentRoot']),
             'proposer' : slot_data['blockContainers'][0]['block']['block']['proposerIndex'],
-            'stateRoot' : slot_data['blockContainers'][0]['block']['block']['stateRoot'],
-            'signature' : slot_data['blockContainers'][0]['block']['signature'],
-            'blockRoot' : slot_data['blockContainers'][0]['blockRoot'],
-            'graffiti' : slot_data['blockContainers'][0]['block']['block']['body']['graffiti'],
-            'randaoReveal' : slot_data['blockContainers'][0]['block']['block']['body']['randaoReveal'],
-            'Eth_1_Block_Hash' :  slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['blockHash'],
+            'stateRoot' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['stateRoot']),
+            'signature' : common.decode_public_key(slot_data['blockContainers'][0]['block']['signature']),
+            'blockRoot' : common.decode_public_key(slot_data['blockContainers'][0]['blockRoot']),
+            'graffiti' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['graffiti']),
+            'randaoReveal' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['randaoReveal']),
+            'Eth_1_Block_Hash' :  common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['blockHash']),
             'Eth_1_Deposit_Count' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositCount'],
-            'Eth_1_Deposit_Root' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositRoot']
+            'Eth_1_Deposit_Root' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositRoot'])
         }
         
         return common.send_sucess_msg(return_data)
