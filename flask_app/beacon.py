@@ -257,8 +257,8 @@ def get_epoch_data(epoch_number):
         } 
     )
 
-    if response.status_code == 200:
-        data = json.loads(response.content.decode('UTF-8'))        
+    if response.status == 200:
+        data = json.loads(response.data.decode('UTF-8'))        
         epoch = (data.get('epoch'))
         finalized = str(data.get('finalized'))
         voted_ether = int(data.get('participation').get('votedEther'))/1000000000
@@ -268,9 +268,9 @@ def get_epoch_data(epoch_number):
         return_data = {
             'epoch': epoch,
             'finalized' :finalized,
-            'voted_ether': str(voted_ether)+' ETH',
+            'voted_ether': str(voted_ether),
             'participation_rate' : str(participation_rate),
-            'eligible_ether' : str(eligible_ether)+ ' Eligible Ether '
+            'eligible_ether' : str(eligible_ether)
         }
 
         #  Total Validator Count
