@@ -16,9 +16,7 @@ base_url = common.api()
 
 def get_current_chain_state():
     try:
-
         response = client_beacon_chain.GetChainHead()
-        
         if response:
             return_data = {
                 'finalizedEpoch' : response.finalized_epoch,
