@@ -155,6 +155,7 @@ def get_attestations(args):
         if attestations.status == 200:
             response = json.loads(attestations.data.decode('UTF-8'))
             attestation_list = response.get('attestations')
+            attestation_list.reverse()
             for data in attestation_list:
                 blockchain_data = data.get('data')
                 blockchain_data['beaconBlockRoot'] = common.decode_public_key(blockchain_data.get('beaconBlockRoot'))
