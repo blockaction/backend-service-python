@@ -85,19 +85,34 @@ def get_vol_data():
     if response.status_code == 200:
         data = response.content.decode('UTF-8')
         data =  common.parse_dictionary(data)
-        total_volumes = data['total_volumes']
-        dateTime = []
-        priceValue = []
-        for x in total_volumes:
-            dt_object = datetime.fromtimestamp(x[0]/1000) # msecond convert ti second
-            t = dt_object.strftime('%d/%m/%Y %H:%M')
-            dateTime.append(t)
-            priceValue.append(x[1])
 
+        total_volumes = data['total_volumes']
+        count = len(total_volumes)
+
+        usdPrice = []
+        marketcapValue =[]
+        dateTime = []
+        marketVolume = []
+
+        for x in range(count):
+            timestamp = total_volumes[x][0]
+            usdvalue = data['prices'][x][1]
+            capvalue = data['market_caps'][x][1]
+            volume = data['total_volumes'][x][1]
+
+            dt_object = datetime.fromtimestamp(timestamp/1000) 
+            t = dt_object.strftime('%d/%m/%Y %H:%M')
+            
+            dateTime.append(t)
+            usdPrice.append(usdvalue)
+            marketcapValue.append(capvalue)
+            marketVolume.append(volume)
 
         return_data = {
             'dateTime' : dateTime,
-            'priceValue' : priceValue
+            'volumeUsd' : marketVolume,
+            'marketCapValue' : marketcapValue,
+            'prices' : usdPrice
         
         }
         return  common.send_sucess_msg(return_data)
