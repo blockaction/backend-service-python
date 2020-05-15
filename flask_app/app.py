@@ -72,5 +72,11 @@ def get_epoch_data(epoch_number):
 def get_participation_rate():
     return third_party.get_data_for_global_participation_rate()
 
+
+@app.route('/volume')
+def get_volume():
+    return third_party.get_vol_data()
+    
+
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')

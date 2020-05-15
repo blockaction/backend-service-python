@@ -1,8 +1,10 @@
 import requests
 from flask_app import common
-import ast 
+import ast
 from flask_app import common
 from flask_app.models import mongo_helper
+from datetime import datetime 
+
 
 base_url = common.api()
 
@@ -61,3 +63,29 @@ def get_data_for_global_participation_rate():
     except Exception as e :
         print (e)
         pass
+
+
+def get_vol_data():
+    url = 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.content.decode('UTF-8')
+        data =  common.parse_dictionary(data)
+        total_volumes = data['total_volumes']
+        dateTime = []
+        priceValue = []
+        for x in total_volumes:
+            dt_object = datetime.fromtimestamp(x[0]/1000) # msecond convert ti second
+            t = dt_object.strftime('%d/%m/%Y %H:%M')
+            dateTime.append(t)
+            priceValue.append(x[1])
+
+
+        return_data = {
+            'dateTime' : dateTime,
+            'priceValue' : priceValue
+        
+        }
+        return  common.send_sucess_msg(return_data)
+    else:
+        return  common.send_error_msg()
