@@ -41,7 +41,7 @@ def send_current_eth_price():
 def get_data_for_global_participation_rate():
     try:
         db_con = mongo_helper.mongo_conn()
-        db_data = db_con.global_participation_temp.find({}).sort([('_id',1)]).limit(24)
+        db_data = db_con.global_participation.find({}).sort([('_id',1)]).limit(24)
 
         timestamp_list = []
         voted_ether_list = []
