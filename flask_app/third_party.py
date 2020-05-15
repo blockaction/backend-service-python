@@ -48,7 +48,7 @@ def get_data_for_global_participation_rate():
         for data in db_data:
             ether = int(data.get('voted_ether'))/1000000000
             timestamp_list.append(data.get('timestamp'))
-            voted_ether_list.append(str(ether) +' ETH')
+            voted_ether_list.append(ether)
             global_participation_list.append(round(data.get('global_participation')*100,2))
 
         return_dict = {
