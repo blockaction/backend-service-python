@@ -22,8 +22,17 @@ def get_current_chain_state():
         if response:
             return_data = {
                 'finalizedEpoch' : response.finalized_epoch,
-                'finalizedSlot' : response.finalized_slot
+                'finalizedSlot' : response.finalized_slot,
+                'currentEpoch' : response.head_epoch,
+                'currentSlot' : response.head_slot
             }
+
+            voted_ether_data = get_participation_rate()
+            if voted_ether_data:
+                participation = voted_ether_data.get('participation')
+                return_data['voted_ether'] = int(participation.get('votedEther'))/1000000000
+                return_data['eligible_ether'] =  int(participation.get('eligibleEther'))/1000000000
+
             price = third_party.get_current_ethereum_price()
             peers_data =  node.node_peers() #TODO get node from rpc 
 
@@ -101,11 +110,6 @@ def get_validators_api(args):
             pk['publicKey'] = pkHex
             data['validator'] = pk
 
-        # pk = validators.get('validatorList')[0]
-        # pk = dict(pk.get('validator'))
-        # pkB64 = pk.get('publicKey')
-        # pkHex = common.decode_public_key(pkB64)
-
 
         return common.send_sucess_msg(validators, **additional_data)
     
@@ -120,9 +124,10 @@ def get_validator_queue():
         if response.status_code == 200:
             data = response.content.decode('UTF-8')
             data = common.parse_dictionary(data)
+            queue = data.get('activationPublicKeys')
             return_data = {
-                'public_keys' : data.get('activationPublicKeys'),
-                'count' : len(data)
+                'public_keys' : queue,
+                'count' : len(queue)
             } 
             return common.send_sucess_msg(return_data)
         else:
