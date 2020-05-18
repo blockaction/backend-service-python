@@ -18,7 +18,7 @@ def get_config():
 
 def api():
     # base_url = "https://api.prylabs.net"
-    base_url = 'http://3.89.9.40:4001'
+    base_url = 'http://54.164.207.192:4001'
     return base_url
 
 
