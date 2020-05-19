@@ -13,8 +13,7 @@ from flask import jsonify
 from flask_cors import CORS
 from flask_app import beacon, third_party, common
 from flask_app import validator
-from flask import request
-
+from flask import Flask,request
 
 
 app = Flask(__name__)
