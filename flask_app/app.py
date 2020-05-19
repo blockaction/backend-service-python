@@ -27,9 +27,7 @@ def get_current_beacon_state():
 
 @app.route('/validators/validators_list')
 def get_validators():
-    pageToken = args.get("page", "")
-    pageSize = request.args.get("perPage", "")
-    return beacon.get_validators_api(request.args,pageToken,pageSize)
+    return beacon.get_validators_api(request.args)
 
 
 
@@ -40,9 +38,8 @@ def get_validator_queue():
 
 @app.route('/attestations')
 def get_attestations():
-    pageToken = args.get("page", "")
-    pageSize = request.args.get("perPage", "")
-    return beacon.get_attestations(request.args,pageToken,pageSize)
+   
+    return beacon.get_attestations(request.args)
 
 
 @app.route('/get_validator_participation')
