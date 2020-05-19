@@ -79,9 +79,8 @@ def list_validators_grpc():
 
 
 
-def get_validators_api(args):
-    pageToken = args.get("page", "")
-    pageSize = request.args.get("perPage", "")
+def get_validators_api(args, pageToken, pageSize):
+
     uri = '/eth/v1alpha1/validators'
     url = base_url+uri
     # pageSize = 10
@@ -137,10 +136,9 @@ def get_validator_queue():
 
 
 
-def get_attestations(args):
+def get_attestations(args, pageToken, pageSize):
     try:
-        pageToken = args.get("page", "")
-        pageSize = request.args.get("perPage", "")
+        
         url = base_url+"/eth/v1alpha1/beacon/attestations"
         current_epoch = str(third_party.get_current_epoch())
         # pageSize = 10
