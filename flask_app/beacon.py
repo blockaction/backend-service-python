@@ -81,7 +81,7 @@ def list_validators_grpc():
 
 def get_validators_api(args):
     pageToken = args.get("page", "")
-    pageSize = request.args.get("pagesize", "")
+    pageSize = request.args.get("pageSize", "")
     uri = '/eth/v1alpha1/validators'
     url = base_url+uri
     # pageSize = 10
