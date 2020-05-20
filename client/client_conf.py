@@ -1,6 +1,4 @@
 def server_address():
-    host = '3.84.232.90'
+    host = '35.153.104.5'
     port = '4000'
     return '{}:{}'.format(host,port)
-
-
