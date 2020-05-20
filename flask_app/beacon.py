@@ -73,49 +73,55 @@ def list_validators_grpc():
         return common.send_sucess_msg({'data':validator_list})
             
     except Exception as e :
-        print (e)
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
 
 
 
 
 
 def get_validators_api(args):
-    pageToken = args.get("page", "1")
-    pageSize = args.get("perPage", "10")
-    uri = '/eth/v1alpha1/validators'
-    url = base_url+uri
-    # pageSize = 10
-    validators = http.request(
-        'GET',
-        url,
-        fields={
-            'slot' : third_party.get_current_slot(),
-            'pageToken' : pageToken,
-            'pageSize' : pageSize
-        } 
-    )
+    try:
+        pageToken = args.get("page", "1")
+        pageSize = args.get("perPage", "10")
+        uri = '/eth/v1alpha1/validators'
+        url = base_url+uri
+        # pageSize = 10
+        validators = http.request(
+            'GET',
+            url,
+            fields={
+                'slot' : third_party.get_current_slot(),
+                'pageToken' : pageToken,
+                'pageSize' : pageSize
+            } 
+        )
 
-    if validators.status == 200:
-        validators =  json.loads(validators.data.decode('UTF-8'))
-        additional_data = {
-            'count' : len(validators.get('validatorList'))
-        }
+        if validators.status == 200:
+            validators =  json.loads(validators.data.decode('UTF-8'))
+            additional_data = {
+                'count' : len(validators.get('validatorList'))
+            }
 
-        validators_list = validators.get('validatorList')
-        for data in validators_list:
-            pk = dict(data.get('validator'))
-            pkB64 = pk.get('publicKey')
-            pkHex = common.decode_public_key(pkB64)
-            pk['publicKey'] = pkHex
-            data['validator'] = pk
+            validators_list = validators.get('validatorList')
+            for data in validators_list:
+                pk = dict(data.get('validator'))
+                pkB64 = pk.get('publicKey')
+                pkHex = common.decode_public_key(pkB64)
+                pk['publicKey'] = pkHex
+                data['validator'] = pk
 
 
-        return common.send_sucess_msg(validators, **additional_data)
-    
-
+            return common.send_sucess_msg(validators, **additional_data)
+        
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
+        
 
 def get_validator_queue():
-
     try:
         uri = '/eth/v1alpha1/validators/queue'
         url = base_url+uri
@@ -132,9 +138,9 @@ def get_validator_queue():
         else:
             return common.send_error_msg()
     except Exception as e :
-        print(e)
+        error = common.get_error_traceback(sys,e)
+        print (error)
         return common.send_error_msg()
-
 
 
 def get_attestations(args):
@@ -170,21 +176,28 @@ def get_attestations(args):
         else:
             return common.send_error_msg()
     except Exception as e :
-        print(e)
+        error = common.get_error_traceback(sys,e)
+        print (error)
         return common.send_error_msg()
 
 
 def get_validator_participation():
-    db =  mongo_helper.mongo_conn()
-    data = db.graph_data.find({}).limit(10)
-    return_data = []
-    for d in data :
-        return_dict = {}
-        return_dict['epoch'] =  d.get('epoch')
-        return_dict['ether'] = d.get('ether')
-        return_data.append(return_dict)
+    try:
 
-    return common.send_sucess_msg({'data':return_data})
+        db =  mongo_helper.mongo_conn()
+        data = db.graph_data.find({}).limit(10)
+        return_data = []
+        for d in data :
+            return_dict = {}
+            return_dict['epoch'] =  d.get('epoch')
+            return_dict['ether'] = d.get('ether')
+            return_data.append(return_dict)
+
+        return common.send_sucess_msg({'data':return_data})
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
 
 
 
@@ -193,54 +206,59 @@ def get_validators_detail_by_public_key(pubkeyHex):
     '''
         Validator info  by Publick Key
     '''
-    uri = '/eth/v1alpha1/validator/status'
-    url = base_url+uri
-    pubkeyB64 = str(common.encode_pubic_key(pubkeyHex[2::]).decode('utf-8'))
-    validators = http.request(
-        'GET',
-        url,
-        fields={
-            'publicKey' : pubkeyB64            
-        } 
-    )
-
-    if validators.status == 200:
-        status_data = validators.data.decode('UTF-8')
-        status_data = common.parse_dictionary(status_data)
-        return_data = {
-            'status' : status_data.get('status'),
-            'activationEpoch' : status_data.get('activationEpoch')
-        }
-        
-        uri = '/eth/v1alpha1/validators/balances'
+    try:
+        uri = '/eth/v1alpha1/validator/status'
         url = base_url+uri
-
-        response = http.request(
+        pubkeyB64 = str(common.encode_pubic_key(pubkeyHex[2::]).decode('utf-8'))
+        validators = http.request(
             'GET',
             url,
             fields={
-                'publicKeys' : pubkeyB64
+                'publicKey' : pubkeyB64            
             } 
         )
 
-        if response.status == 200:
-            balance_data = response.data.decode('UTF-8')
-            balance_data = common.parse_dictionary(balance_data).get('balances')
-            balance_data = balance_data[0]
+        if validators.status == 200:
+            status_data = validators.data.decode('UTF-8')
+            status_data = common.parse_dictionary(status_data)
+            return_data = {
+                'status' : status_data.get('status'),
+                'activationEpoch' : status_data.get('activationEpoch')
+            }
+            
+            uri = '/eth/v1alpha1/validators/balances'
+            url = base_url+uri
 
-            balance =  int(balance_data.get('balance'))/9000000000
-            balance = str(round(balance, 2)) +" ETH"
+            response = http.request(
+                'GET',
+                url,
+                fields={
+                    'publicKeys' : pubkeyB64
+                } 
+            )
 
-            index = balance_data.get('index')
+            if response.status == 200:
+                balance_data = response.data.decode('UTF-8')
+                balance_data = common.parse_dictionary(balance_data).get('balances')
+                balance_data = balance_data[0]
 
-        
-            return_data['balance'] = balance
-            return_data['index'] = index
+                balance =  int(balance_data.get('balance'))/9000000000
+                balance = str(round(balance, 2)) +" ETH"
 
-            return common.send_sucess_msg(return_data)
-    else:
+                index = balance_data.get('index')
+
+            
+                return_data['balance'] = balance
+                return_data['index'] = index
+
+                return common.send_sucess_msg(return_data)
+        else:
+            return common.send_error_msg()
+
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
         return common.send_error_msg()
-
 
 def searchable_data(data):
     try: 
@@ -249,67 +267,76 @@ def searchable_data(data):
             return get_validators_detail_by_public_key(data)
 
     except Exception as e:
-        pass 
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
 
 
 def get_epoch_data(epoch_number):
-    uri = '/eth/v1alpha1/validators/participation'
-    url = base_url+uri
-    response = http.request(
-        'GET',
-        url,
-        fields={
-            'epoch_number' : str(epoch_number)           
-        } 
-    )
+    try:
 
-    if response.status == 200:
-        data = json.loads(response.data.decode('UTF-8'))        
-        epoch = (data.get('epoch'))
-        finalized = str(data.get('finalized'))
-        voted_ether = int(data.get('participation').get('votedEther'))/1000000000
-        participation_rate = int(data.get('participation').get('globalParticipationRate'))
-        eligible_ether = int(data.get('participation').get('eligibleEther'))/1000000000
-        # validtor quee lenth
-        return_data = {
-            'epoch': epoch,
-            'finalized' :finalized,
-            'voted_ether': str(voted_ether),
-            'participation_rate' : str(participation_rate),
-            'eligible_ether' : str(eligible_ether)
-        }
-
-        #  Total Validator Count
-        uri = '/eth/v1alpha1/validators'
+        uri = '/eth/v1alpha1/validators/participation'
         url = base_url+uri
-        validators = http.request(
+        response = http.request(
             'GET',
             url,
             fields={
-                'epoch' : epoch_number                         
+                'epoch_number' : str(epoch_number)           
             } 
         )
 
-        if validators.status == 200:
-            validators =  json.loads(validators.data.decode('UTF-8'))
-            total_data = {
-                'total_validator_count' : str(validators.get('totalSize'))
+        if response.status == 200:
+            data = json.loads(response.data.decode('UTF-8'))        
+            epoch = (data.get('epoch'))
+            finalized = str(data.get('finalized'))
+            voted_ether = int(data.get('participation').get('votedEther'))/1000000000
+            participation_rate = int(data.get('participation').get('globalParticipationRate'))
+            eligible_ether = int(data.get('participation').get('eligibleEther'))/1000000000
+            # validtor quee lenth
+            return_data = {
+                'epoch': epoch,
+                'finalized' :finalized,
+                'voted_ether': str(voted_ether),
+                'participation_rate' : str(participation_rate),
+                'eligible_ether' : str(eligible_ether)
             }
 
-       #  Pending Count
-        uri = '/eth/v1alpha1/validators/queue'
-        url = base_url+uri
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.content.decode('UTF-8')
-            data = common.parse_dictionary(data)
-            pending_data = {
+            #  Total Validator Count
+            uri = '/eth/v1alpha1/validators'
+            url = base_url+uri
+            validators = http.request(
+                'GET',
+                url,
+                fields={
+                    'epoch' : epoch_number                         
+                } 
+            )
 
-                'pending_count' : str(len(data.get('activationPublicKeys')))
-            } 
-            
-        return common.send_sucess_msg(return_data, **pending_data, **total_data)
-    else:
+            if validators.status == 200:
+                validators =  json.loads(validators.data.decode('UTF-8'))
+                total_data = {
+                    'total_validator_count' : str(validators.get('totalSize'))
+                }
+
+        #  Pending Count
+            uri = '/eth/v1alpha1/validators/queue'
+            url = base_url+uri
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.content.decode('UTF-8')
+                data = common.parse_dictionary(data)
+                pending_data = {
+
+                    'pending_count' : str(len(data.get('activationPublicKeys')))
+                } 
+                
+            return common.send_sucess_msg(return_data, **pending_data, **total_data)
+        else:
+            return common.send_error_msg()
+
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
         return common.send_error_msg()
 
 
@@ -318,38 +345,43 @@ def get_epoch_data(epoch_number):
 # data from slot Number
 
 def get_slot_data(slot):
-    uri = '/eth/v1alpha1/beacon/blocks'
-    url = base_url+uri
-    response = http.request(
-        'GET',
-        url,
-        fields={
-            'slot' : slot          
-        } 
-    )
+    try:
 
-    if response.status == 200:
-        slot_data = response.data.decode('UTF-8')
-        slot_data = common.parse_dictionary(slot_data)
-        return_data = {
-            'slotNumber' : slot,
-            'ParentRootHas' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['parentRoot']),
-            'proposer' : slot_data['blockContainers'][0]['block']['block']['proposerIndex'],
-            'stateRoot' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['stateRoot']),
-            'signature' : common.decode_public_key(slot_data['blockContainers'][0]['block']['signature']),
-            'blockRoot' : common.decode_public_key(slot_data['blockContainers'][0]['blockRoot']),
-            'graffiti' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['graffiti']),
-            'randaoReveal' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['randaoReveal']),
-            'Eth_1_Block_Hash' :  common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['blockHash']),
-            'Eth_1_Deposit_Count' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositCount'],
-            'Eth_1_Deposit_Root' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositRoot'])
-        }
-        
-        return common.send_sucess_msg(return_data)
-    else:
+        uri = '/eth/v1alpha1/beacon/blocks'
+        url = base_url+uri
+        response = http.request(
+            'GET',
+            url,
+            fields={
+                'slot' : slot          
+            } 
+        )
+
+        if response.status == 200:
+            slot_data = response.data.decode('UTF-8')
+            slot_data = common.parse_dictionary(slot_data)
+            return_data = {
+                'slotNumber' : slot,
+                'ParentRootHas' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['parentRoot']),
+                'proposer' : slot_data['blockContainers'][0]['block']['block']['proposerIndex'],
+                'stateRoot' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['stateRoot']),
+                'signature' : common.decode_public_key(slot_data['blockContainers'][0]['block']['signature']),
+                'blockRoot' : common.decode_public_key(slot_data['blockContainers'][0]['blockRoot']),
+                'graffiti' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['graffiti']),
+                'randaoReveal' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['randaoReveal']),
+                'Eth_1_Block_Hash' :  common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['blockHash']),
+                'Eth_1_Deposit_Count' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositCount'],
+                'Eth_1_Deposit_Root' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositRoot'])
+            }
+            
+            return common.send_sucess_msg(return_data)
+        else:
+            return common.send_error_msg()
+
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
         return common.send_error_msg()
-
-
 
 
 def get_participation_rate():
@@ -368,5 +400,6 @@ def get_participation_rate():
             return data
 
     except Exception as e :
-        print (e)
-        pass
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
