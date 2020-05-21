@@ -80,7 +80,8 @@ def get_data_for_global_participation_rate():
 
 
 def get_vol_data():
-    url = 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7'
+    time = args.get("time", "")
+    url = 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=' +time
     response = requests.get(url)
     if response.status_code == 200:
         data = response.content.decode('UTF-8')
@@ -101,7 +102,7 @@ def get_vol_data():
             volume = data['total_volumes'][x][1]
 
             dt_object = datetime.fromtimestamp(timestamp/1000) 
-            t = dt_object.strftime('%d/%m/%Y %H:%M')
+            t = dt_object.strftime('%a,%b %d %Y,%H:%M')
             
             dateTime.append(t)
             usdPrice.append(usdvalue)
