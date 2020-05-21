@@ -75,7 +75,7 @@ def get_participation_rate():
 
 @app.route('/volume')
 def get_volume():
-    return third_party.get_vol_data(request.args)
+    return third_party.get_vol_data()
     
 
 if __name__ == "__main__":
