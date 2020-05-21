@@ -79,8 +79,8 @@ def get_data_for_global_participation_rate():
         pass
 
 
-def get_vol_data():
-    time = request.args.get("time", "")
+def get_vol_data(args):
+    time = args.get("time", "")
     url = 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=' +time
     response = requests.get(url)
     if response.status_code == 200:
