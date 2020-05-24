@@ -1,5 +1,4 @@
-git+https://gitlab.com/mcs-python-base/common/mcs-common-service.git@22dfe517bd7181ce0fd97cc38f86ba6b2d974434
-git+https://gitlab.com/mcs-python-base/common/mcs-protos.git@b2d33ecdaa0e61b1540c0526464912c31f1b5b5a
+git+https://github.com/parin13/eth2_public_protos.git@d592c291d7f6e022a6988f5d3d36f9b1e8b89a2a
 cachetools==4.1.0
 certifi==2020.4.5.1
 chardet==3.0.4
@@ -20,7 +19,6 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
 marshmallow==3.4.0
-mysqlclient==1.4.2.post1
 post==2019.4.13
 protobuf==3.11.3
 psycopg2==2.8.4
@@ -34,6 +32,7 @@ redis==3.4.1
 request==2019.4.13
 requests==2.23.0
 rsa==4.0
+schedule==0.6.0
 six==1.14.0
 uritemplate==3.0.1
 urllib3==1.25.9
