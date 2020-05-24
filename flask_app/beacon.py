@@ -385,6 +385,8 @@ def get_slot_data(slot):
 
 
 def get_participation_rate():
+
+
     ''' 
         gives the global participation rate
     '''
@@ -394,6 +396,28 @@ def get_participation_rate():
         response = http.request(
             'GET',
             url
+        )
+        if response.status == 200:
+            data =  json.loads(response.data.decode('utf-8'))
+            return data
+
+    except Exception as e :
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
+
+
+def get_block_data():
+    '''gives block by slot '''
+    try:
+        uri = '/eth/v1alpha1/beacon/blocks'
+        url = base_url+uri
+        response = http.request(
+            'GET',
+            url,
+            fields={
+                'slot' : '247357'
+            }
         )
         if response.status == 200:
             data =  json.loads(response.data.decode('utf-8'))

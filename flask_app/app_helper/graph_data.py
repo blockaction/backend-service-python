@@ -10,10 +10,10 @@ import schedule
 import time
 
 
-sys.path.insert(0, abspath(join(dirname(__file__), '../')))
+os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
 from flask_app import beacon
-from flask_app.models import redis_helper,mongo_helper
+from  flask_app.models import redis_helper,mongo_helper
 
 base_url = common.api()
 

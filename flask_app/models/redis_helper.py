@@ -2,13 +2,15 @@ import os, sys
 import redis
 from flask_app import common as common_util
 
+config = common_util.get_config()
+
+
 def redis_connection():
     """
     Redis Connection
     """
 
     try:
-        config = common_util.get_config()
 
         pool = redis.ConnectionPool(
             host=config.get('redis', 'host'),
@@ -57,11 +59,22 @@ def del_key(key):
         print (error)
         return False
 
+def hset(key_hash,key,value):
+    try:
+        redis_con = redis_connection()
+        hset_status = redis_con.hset(key_hash,key, value)
+        return hset_status 
+    except Exception as e :
+        print (error)
+        return False
+
+
 def hget(hash,key):
     try:
         red_con = redis_connection()
         value = red_con.hget(hash,key).decode('utf-8')
         return value
     except Exception as e :
+        error = common_util.get_error_traceback(sys, e)
         print (error)
-        return False
+        raise 

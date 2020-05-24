@@ -7,9 +7,9 @@ import configparser
 from datetime import datetime
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.curdir))
 conf_file_path = BASE_DIR+'/configuration.ini'
-config = configparser.RawConfigParser()
+config = configparser.ConfigParser()
 config.read(conf_file_path)
 
 def get_config():

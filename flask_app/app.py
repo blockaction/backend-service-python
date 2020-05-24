@@ -76,7 +76,13 @@ def get_participation_rate():
 @app.route('/volume')
 def get_volume():
     return third_party.get_vol_data(request.args)
-    
+
+@app.route('/block_data')
+def get_block_data():
+    return beacon.get_block_data()
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True,host= '0.0.0.0')
