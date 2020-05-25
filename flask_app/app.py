@@ -20,60 +20,59 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/beacon/get_current_chain_state')
+@app.route('/api/beacon/get_current_chain_state')
 def get_current_beacon_state():
     return beacon.get_current_chain_state()
 
 
-@app.route('/validators/validators_list')
+@app.route('/api/validators/validators_list')
 def get_validators():
     return beacon.get_validators_api(request.args)
 
 
 
-@app.route('/validators_queue')
+@app.route('/api/validators_queue')
 def get_validator_queue():
     return beacon.get_validator_queue()
 
 
-@app.route('/attestations')
+@app.route('/api/attestations')
 def get_attestations():
-   
     return beacon.get_attestations(request.args)
 
 
-@app.route('/get_validator_participation')
+@app.route('/api/get_validator_participation')
 def get_graph_data():
     return beacon.get_validator_participation()
 
-@app.route('/validator/info/<publicKey>')
+@app.route('/api/validator/info/<publicKey>')
 def get_validators_detail_by_public_kehiy(publicKey):
     return beacon.get_validators_detail_by_public_key(publicKey)
 
 
-@app.route('/getinfo/<data>')
+@app.route('/api/getinfo/<data>')
 def get_info(data):
     return beacon.searchable_data(data)
 
-@app.route('/get_eth_price')
+@app.route('/api/get_eth_price')
 def get_eth_price():
     return third_party.send_current_eth_price()
 
-@app.route('/slot/<slot>')
+@app.route('/api/slot/<slot>')
 def get_slot_data(slot):
     return beacon.get_slot_data(slot)
 
-@app.route('/epoch/<epoch_number>')
+@app.route('/api/epoch/<epoch_number>')
 def get_epoch_data(epoch_number):
     return beacon.get_epoch_data(epoch_number)
 
 
-@app.route('/get_participation_rate')
+@app.route('/api/get_participation_rate')
 def get_participation_rate():
     return third_party.get_data_for_global_participation_rate()
 
 
-@app.route('/volume')
+@app.route('/api/volume')
 def get_volume():
     return third_party.get_vol_data(request.args)
     
