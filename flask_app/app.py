@@ -38,7 +38,6 @@ def get_validator_queue():
 
 @app.route('/api/attestations')
 def get_attestations():
-   
     return beacon.get_attestations(request.args)
 
 
@@ -62,6 +61,11 @@ def get_eth_price():
 @app.route('/api/slot/<slot>')
 def get_slot_data(slot):
     return beacon.get_slot_data(slot)
+
+@app.route('/api/attestion')
+def get_attestion_by_slot():
+    return beacon.get_attestion_by_slot(request.args)
+
 
 @app.route('/api/epoch/<epoch_number>')
 def get_epoch_data(epoch_number):

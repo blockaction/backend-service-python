@@ -67,6 +67,7 @@ def decode_bytes_utf8(byteStr):
     utf = pubkeyBytes.decode('utf-8')
     return utf
 
+
 def encode_pubic_key(pubkeyHex):
     ''' 
         encode hex key to base64 pubkey

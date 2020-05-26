@@ -363,7 +363,7 @@ def get_slot_data(slot):
         if response.status == 200:
             slot_data = response.data.decode('UTF-8')
             slot_data = common.parse_dictionary(slot_data)
-            block_container = slot_data.get('blockContainers') #gives the list
+            block_container = slot_data.get('blockContainers')
             return_list = []
             for single_block_data in block_container:
                 return_data = {
@@ -406,7 +406,7 @@ def get_slot_data(slot):
 
                 return_list.append(return_data)
 
-            return common.send_sucess_msg({'data': return_data})
+            return common.send_sucess_msg({'data': return_list})
         else:
             return common.send_error_msg()
 
@@ -416,9 +416,72 @@ def get_slot_data(slot):
         return common.send_error_msg()
 
 
+
+def get_attestion_by_slot(args):
+    try:
+        '''
+
+        '''
+        uri = '/eth/v1alpha1/beacon/blocks'
+        url = base_url+uri
+        response = http.request(
+            'GET',
+            url,
+            fields={
+                'slot' : args.get('slot')
+            } 
+        )
+
+        if response.status == 200:
+            slot_data = response.data.decode('UTF-8')
+            slot_data = common.parse_dictionary(slot_data)
+
+            block_container = slot_data.get('blockContainers')
+            return_list = []
+            for single_block_data in block_container:
+                return_data = {
+
+                }
+                block_data = single_block_data.get('block')
+                block_detail = block_data.get('block')
+                return_data['slot'] = block_detail.get('slot')
+                block_body = block_detail.get('body')
+                
+                attestians_data = block_body.get('attestations')
+                return_data['attestations_count'] = len(attestians_data)
+
+                attestian_list = []
+                for single_attestation in attestians_data:
+                    single_attestians_return_data = {
+
+                    }
+                    single_attestians_return_data['aggregationBits'] = single_attestation.get('aggregationBits')
+                    single_attestians_return_data['signature'] = common.decode_public_key(single_attestation.get('signature'))
+
+                    single_attestians_data = single_attestation.get('data')
+
+                    single_attestians_return_data['beaconBlockRoot'] = common.decode_public_key(single_attestians_data.get('beaconBlockRoot'))
+                    single_attestians_return_data['committeeIndex'] = single_attestians_data.get('committeeIndex')
+                    single_attestians_return_data['source_epoch'] = single_attestians_data.get('source').get('epoch')
+                    single_attestians_return_data['source_epoch_root'] = common.decode_public_key(single_attestians_data.get('source').get('root'))
+                    single_attestians_return_data['target_epoch'] = single_attestians_data.get('target').get('epoch')
+                    single_attestians_return_data['target_epoch_root'] = common.decode_public_key(single_attestians_data.get('target').get('root'))
+
+                    attestian_list.append(single_attestians_return_data)
+                
+                return_data['attestian_detail'] = attestian_list
+
+
+            return common.send_sucess_msg({'data': return_data})
+        else:
+            return common.send_error_msg()
+
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return common.send_error_msg()
+
 def get_participation_rate():
-
-
     ''' 
         gives the global participation rate
     '''
