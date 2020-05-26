@@ -346,7 +346,10 @@ def get_epoch_data(epoch_number):
 
 def get_slot_data(slot):
     try:
-
+        '''
+           retrives block by slot 
+           A slot is a chance for a block to be added to the Beacon Chain and shards.
+        '''
         uri = '/eth/v1alpha1/beacon/blocks'
         url = base_url+uri
         response = http.request(
@@ -360,21 +363,50 @@ def get_slot_data(slot):
         if response.status == 200:
             slot_data = response.data.decode('UTF-8')
             slot_data = common.parse_dictionary(slot_data)
-            return_data = {
-                'slotNumber' : slot,
-                'ParentRootHas' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['parentRoot']),
-                'proposer' : slot_data['blockContainers'][0]['block']['block']['proposerIndex'],
-                'stateRoot' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['stateRoot']),
-                'signature' : common.decode_public_key(slot_data['blockContainers'][0]['block']['signature']),
-                'blockRoot' : common.decode_public_key(slot_data['blockContainers'][0]['blockRoot']),
-                'graffiti' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['graffiti']),
-                'randaoReveal' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['randaoReveal']),
-                'Eth_1_Block_Hash' :  common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['blockHash']),
-                'Eth_1_Deposit_Count' : slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositCount'],
-                'Eth_1_Deposit_Root' : common.decode_public_key(slot_data['blockContainers'][0]['block']['block']['body']['eth1Data']['depositRoot'])
-            }
-            
-            return common.send_sucess_msg(return_data)
+            block_container = slot_data.get('blockContainers') #gives the list
+            return_list = []
+            for single_block_data in block_container:
+                return_data = {
+
+                }
+                return_data['block_root'] =  common.decode_public_key(single_block_data.get('blockRoot'))
+                block_data = single_block_data.get('block')
+               
+                return_data['signature'] = common.decode_public_key(block_data.get('signature'))
+                block_detail = block_data.get('block')
+
+                return_data['parent_root'] = common.decode_public_key(block_detail.get('parentRoot'))
+                return_data['proposer'] = block_detail.get('proposerIndex')
+                return_data['slot'] = block_detail.get('slot')
+                return_data['state_root'] = common.decode_public_key(block_detail.get('stateRoot'))
+                block_body = block_detail.get('body')
+                
+
+                return_data['graffiti'] = {
+                    'utf_8' : common.decode_bytes_utf8(block_body.get('graffiti')),
+                    'hex' : common.decode_public_key(block_body.get('graffiti'))
+                }
+                return_data['randao_reveal'] = common.decode_public_key(block_body.get('randaoReveal'))
+                return_data['deposits'] = len(block_body.get('deposits'))
+                return_data['voluntaryExits'] = len(block_body.get('voluntaryExits'))
+
+                return_data['slashing'] = {
+                    'attester' : len(block_body.get('attesterSlashings')),
+                    'proposer' : len(block_body.get('proposerSlashings'))
+                }
+
+                eth1_encoded_data = block_body.get('eth1Data')
+                return_data['eth1_data'] = {
+                    'block_hash' : common.decode_public_key(eth1_encoded_data.get('blockHash')),
+                    'deposit_count' : eth1_encoded_data.get('depositCount'),
+                    'deposit_root' : common.decode_public_key(eth1_encoded_data.get('depositRoot'))
+                }
+
+                return_data['attestations_count'] = len(block_body.get('attestations'))
+
+                return_list.append(return_data)
+
+            return common.send_sucess_msg({'data': return_data})
         else:
             return common.send_error_msg()
 
@@ -406,24 +438,3 @@ def get_participation_rate():
         print (error)
         return common.send_error_msg()
 
-
-def get_block_data():
-    '''gives block by slot '''
-    try:
-        uri = '/eth/v1alpha1/beacon/blocks'
-        url = base_url+uri
-        response = http.request(
-            'GET',
-            url,
-            fields={
-                'slot' : '247357'
-            }
-        )
-        if response.status == 200:
-            data =  json.loads(response.data.decode('utf-8'))
-            return data
-
-    except Exception as e :
-        error = common.get_error_traceback(sys,e)
-        print (error)
-        return common.send_error_msg()

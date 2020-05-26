@@ -18,7 +18,7 @@ def get_config():
 
 def api():
     # base_url = "https://api.prylabs.net"
-    base_url = 'http://3.94.76.3:4001'
+    base_url = 'http://34.229.64.192:4001'
     return base_url
 
 
@@ -57,6 +57,15 @@ def decode_public_key(pubkeyB64):
     pubkeyHex = pubkeyBytes.hex()   
     return '0x'+pubkeyHex
 
+
+
+def decode_bytes_utf8(byteStr):
+    '''
+        decode base64 to hex format
+    '''
+    pubkeyBytes = base64.b64decode(byteStr)
+    utf = pubkeyBytes.decode('utf-8')
+    return utf
 
 def encode_pubic_key(pubkeyHex):
     ''' 
