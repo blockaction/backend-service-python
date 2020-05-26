@@ -406,14 +406,14 @@ def get_slot_data(slot):
 
                 return_list.append(return_data)
 
-            return common.send_sucess_msg({'data': return_list})
+            return return_list
         else:
-            return common.send_error_msg()
+            return False
 
     except Exception as e:
         error = common.get_error_traceback(sys,e)
         print (error)
-        return common.send_error_msg()
+        return False
 
 
 
@@ -480,6 +480,33 @@ def get_attestion_by_slot(args):
         error = common.get_error_traceback(sys,e)
         print (error)
         return common.send_error_msg()
+
+
+def get_latest_block():
+    '''gives data of latest block from db'''
+    try :
+        db_con = mongo_helper.mongo_conn()
+        db_data = db_con.latest_block.find({}).sort([('_id',-1)]).limit(10)
+        if not db_data:
+            raise
+
+        return_list = []
+        for data in db_data:
+            return_dict = {
+                
+            }
+            return_dict['epoch'] = data.get('epoch')
+            return_dict['slot'] = data.get('slot')
+            return_dict['proposer'] = data.get('proposer')
+            return_dict['attestian_count'] = data.get('attestian_count')
+            return_list.append(return_dict)
+        
+        return common.send_sucess_msg({'data': return_list})
+    except Exception as e:
+        error = common.get_error_traceback(sys,e)
+        print (error)
+        return False
+
 
 def get_participation_rate():
     ''' 
