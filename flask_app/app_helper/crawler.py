@@ -5,6 +5,7 @@ import ast
 import time 
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from client  import client_beacon_chain
 
 import schedule
 
@@ -19,21 +20,37 @@ config = common.get_config()
 def crawl_chain_head():
     print ('Executing Crawler script....')
     try:
-        uri = '/eth/v1alpha1/beacon/chainhead'
-        url = base_url+uri
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.content.decode('UTF-8')
-            data = ast.literal_eval(data)
-            current_epoch = int(data.get('headEpoch'))
-            current_slot  = int(data.get('headSlot'))
+        for chain_head_data in  client_beacon_chain.getChainHeadStream():
+            current_epoch = int(chain_head_data.get('headEpoch'))
+            current_slot  = int(chain_head_data.get('headSlot'))
             
             crawled_slot = int(redis_helper.hget(
                 hash= 'chain_head',
                 key = 'current_slot'
             ))
             print('crawled slot is {} current slot is {}'.format(crawled_slot,current_slot))
+
             if crawled_slot < current_slot:
+                diffrence = current_slot - crawled_slot
+
+                if diffrence > 1 :
+                    #case of skipped block
+                    print ('processing skipped block')
+                    for i in range(diffrence -1):
+                        crawled_slot = crawled_slot + 1
+
+                        print ('processing skipped block: {} '.format(crawled_slot))
+
+                        db_conn = mongo_helper.mongo_conn()
+                        db_status = db_conn.latest_block.insert({
+                            'epoch' : int(current_epoch),
+                            'slot' : int(crawled_slot),
+                            'proposer' : 'NA',
+                            'attestian_count' : 0,
+                            'status' : 'Skipped'
+                        })
+                        print (db_status)
+     
                 print ('processing redis operation.........')
                 redis_set_slot = redis_helper.hset(
                     key_hash = 'chain_head',
@@ -56,11 +73,6 @@ def crawl_chain_head():
                 attestian_count = slot_data.get('attestations_count', '0')
                 proposer = slot_data.get('proposer', 'NA')
 
-                status = 'proposed'
-
-                if slot_data.get('status') == 'skipped':
-                    status = 'skipped'
-
                 print ('processing_db operation')
 
                 db_conn = mongo_helper.mongo_conn()
@@ -69,7 +81,7 @@ def crawl_chain_head():
                     'slot' : str(current_slot),
                     'proposer' : proposer,
                     'attestian_count' : attestian_count,
-                    'status' : status
+                    'status' : 'proposed'
                 })
                 print (db_status)
 
@@ -82,14 +94,6 @@ def crawl_chain_head():
         print (error)
 
 
-schedule.every(8).seconds.do(crawl_chain_head)
-
-
-while True:
-    print ("*"*30)
-    print ('Running python shedular for blockchain crawler')
-    schedule.run_pending()
-    time.sleep(2)
 
 
 crawl_chain_head()
