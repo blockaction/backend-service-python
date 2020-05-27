@@ -53,8 +53,13 @@ def crawl_chain_head():
                         value = current_epoch
                     )
                 slot_data = beacon.get_slot_data(current_slot)[0]
-                attestian_count = slot_data.get('attestations_count')
-                proposer = slot_data.get('proposer')
+                attestian_count = slot_data.get('attestations_count', '0')
+                proposer = slot_data.get('proposer', 'NA')
+
+                status = 'proposed'
+
+                if slot_data.get('status') == 'skipped':
+                    status = 'skipped'
 
                 print ('processing_db operation')
 
@@ -63,7 +68,8 @@ def crawl_chain_head():
                     'epoch' : str(current_epoch),
                     'slot' : str(current_slot),
                     'proposer' : proposer,
-                    'attestian_count' : attestian_count
+                    'attestian_count' : attestian_count,
+                    'status' : status
                 })
                 print (db_status)
 

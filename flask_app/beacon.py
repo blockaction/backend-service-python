@@ -364,10 +364,19 @@ def get_slot_data(slot):
             slot_data = response.data.decode('UTF-8')
             slot_data = common.parse_dictionary(slot_data)
             block_container = slot_data.get('blockContainers')
+            
+            if len(block_container) == 0 :
+                return_data = [{
+                    'status' : 'skipped',
+                    'slot' : slot
+                }]
+
+                return return_data
+
             return_list = []
             for single_block_data in block_container:
                 return_data = {
-
+                    'status' : 'proposed'
                 }
                 return_data['block_root'] =  common.decode_public_key(single_block_data.get('blockRoot'))
                 block_data = single_block_data.get('block')
@@ -496,10 +505,11 @@ def get_latest_block(args):
             return_dict = {
                 
             }
-            return_dict['epoch'] = data.get('epoch')
-            return_dict['slot'] = data.get('slot')
-            return_dict['proposer'] = data.get('proposer')
-            return_dict['attestian_count'] = data.get('attestian_count')
+            return_dict['epoch'] = data.get('epoch','NA')
+            return_dict['slot'] = data.get('slot','NA')
+            return_dict['proposer'] = data.get('proposer','NA')
+            return_dict['attestian_count'] = data.get('attestian_count','NA')
+            return_dict['status'] = data.get('status','NA')
             return_list.append(return_dict)
         
         return common.send_sucess_msg({'data': return_list})
