@@ -7,9 +7,9 @@ import configparser
 from datetime import datetime
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.curdir))
 conf_file_path = BASE_DIR+'/configuration.ini'
-config = configparser.RawConfigParser()
+config = configparser.ConfigParser()
 config.read(conf_file_path)
 
 def get_config():
@@ -56,6 +56,16 @@ def decode_public_key(pubkeyB64):
     pubkeyBytes = base64.b64decode(pubkeyB64)
     pubkeyHex = pubkeyBytes.hex()   
     return '0x'+pubkeyHex
+
+
+
+def decode_bytes_utf8(byteStr):
+    '''
+        decode base64 to hex format
+    '''
+    pubkeyBytes = base64.b64decode(byteStr)
+    utf = pubkeyBytes.decode('utf-8')
+    return utf
 
 
 def encode_pubic_key(pubkeyHex):

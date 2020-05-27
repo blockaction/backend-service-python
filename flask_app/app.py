@@ -60,7 +60,20 @@ def get_eth_price():
 
 @app.route('/api/slot/<slot>')
 def get_slot_data(slot):
-    return beacon.get_slot_data(slot)
+    data =  beacon.get_slot_data(slot)
+    if data:
+        return common.send_sucess_msg({'data': data})
+    else:
+        return common.send_error_msg()
+
+@app.route('/api/attestion')
+def get_attestion_by_slot():
+    return beacon.get_attestion_by_slot(request.args)
+
+@app.route('/api/latest_block')
+def get_latest_block():
+    return beacon.get_latest_block()
+
 
 @app.route('/api/epoch/<epoch_number>')
 def get_epoch_data(epoch_number):
@@ -72,10 +85,17 @@ def get_participation_rate():
     return third_party.get_data_for_global_participation_rate()
 
 
+@app.route('/api/get_latest_block')
+def get_letest_block():
+    return beacon.get_latest_block(request.args)
+
+
 @app.route('/api/volume')
 def get_volume():
     return third_party.get_vol_data(request.args)
-    
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=False,host= '0.0.0.0')
