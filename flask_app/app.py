@@ -87,7 +87,7 @@ def get_participation_rate():
 
 @app.route('/api/get_latest_block')
 def get_letest_block():
-    return beacon.get_latest_block()
+    return beacon.get_latest_block(request.args)
 
 
 @app.route('/api/volume')
