@@ -21,6 +21,23 @@ def GetChainHead():
         raise e
         return False
 
+def getChainHeadStream():
+    try:
+        with grpc.insecure_channel(client_conf.server_address()) as channel:
+            stub = beacon_chain_pb2_grpc.BeaconChainStub(channel)
+            for data in stub.StreamChainHead(get_empty_data()):
+                return_data = {
+                    'headEpoch' : data.head_epoch,
+                    'headSlot' : data.head_slot
+                }
+
+                yield return_data
+
+            
+    except Exception as e:
+        print (e)
+        raise e
+        return False
 
 def list_validators():
     try:    
