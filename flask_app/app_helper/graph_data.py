@@ -2,17 +2,16 @@ import os, sys
 from os.path import dirname, join, abspath
 
 import requests 
-import models
-import common
+
 import json 
 import datetime
 import schedule
 import time
 
 
-os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-from flask_app import beacon
+from flask_app import beacon, common
 from  flask_app.models import redis_helper,mongo_helper
 
 base_url = common.api()
