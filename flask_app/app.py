@@ -85,9 +85,9 @@ def get_participation_rate():
     return third_party.get_data_for_global_participation_rate()
 
 
-# @app.route('/api/get_letest_block')
-# def get_participation_rate():
-#     return third_party.get_data_for_global_participation_rate()
+@app.route('/api/get_latest_block')
+def get_letest_block():
+    return beacon.get_latest_block()
 
 
 @app.route('/api/volume')
