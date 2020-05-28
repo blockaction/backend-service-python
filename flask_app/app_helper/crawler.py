@@ -26,7 +26,7 @@ def crawl_chain_head():
             
             crawled_slot = int(redis_helper.hget(
                 hash= 'chain_head',
-                key = 'current_slot'
+                key = 'current_slot_'
             ))
             print('crawled slot is {} current slot is {}'.format(crawled_slot,current_slot))
 
@@ -54,19 +54,19 @@ def crawl_chain_head():
                 print ('processing redis operation.........')
                 redis_set_slot = redis_helper.hset(
                     key_hash = 'chain_head',
-                    key = 'current_slot',
+                    key = 'current_slot_',
                     value = current_slot
                 )
 
                 crawled_epoch = int(redis_helper.hget(
                     hash= 'chain_head',
-                    key = 'current_epoch'
+                    key = 'current_epoch_'
                 ))
                 
                 if crawled_epoch < current_epoch:
                     redis_set_epoch = redis_helper.hset(
                         key_hash = 'chain_head',
-                        key = 'current_epoch',
+                        key = 'current_epoch_',
                         value = current_epoch
                     )
                 slot_data = beacon.get_slot_data(current_slot)[0]
