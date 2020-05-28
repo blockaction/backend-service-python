@@ -224,8 +224,9 @@ def get_validators_detail_by_public_key(pubkeyHex):
             return_data = {
                 'status' : status_data.get('status'),
                 'activationEpoch' : status_data.get('activationEpoch')
+                # 'eth1_DepositBlockNumber' : status_data.get('eth1DepositBlockNumber')
             }
-            
+
             uri = '/eth/v1alpha1/validators/balances'
             url = base_url+uri
 
@@ -239,19 +240,44 @@ def get_validators_detail_by_public_key(pubkeyHex):
 
             if response.status == 200:
                 balance_data = response.data.decode('UTF-8')
+                epoch = common.parse_dictionary(balance_data).get('epoch')
                 balance_data = common.parse_dictionary(balance_data).get('balances')
                 balance_data = balance_data[0]
-
-                balance =  int(balance_data.get('balance'))/9000000000
-                balance = str(round(balance, 2)) +" ETH"
-
+                
+                balance =  int(balance_data.get('balance'))/1000000000
+                deposits_Received = int(balance_data.get('balance'))/1000000000
+                deposits_Received = str(round(deposits_Received, 0)) +" ETH"
+                balance = str(round(balance, 4)) +" ETH"
                 index = balance_data.get('index')
 
-            
-                return_data['balance'] = balance
-                return_data['index'] = index
+            uri = '/eth/v1alpha1/validator'
+            url = base_url+uri
+            validators = http.request(
+                'GET',
+                url,
+                fields={
+                    'index' : index           
+                } 
+            )
+           
+            if validators.status == 200:
+                validators =  json.loads(validators.data.decode('UTF-8'))
+                additional_data = {
+                    # 'publicKey' : validators.get('publicKey'),
+                    'effectiveBalance' : str(int(validators.get('effectiveBalance'))/1000000000) + " ETH",
+                    'slashed' : validators.get('slashed'),
+                    'eligibilityEpoch' : validators.get('activationEligibilityEpoch'),
+                    'withdrawalCredentials' : validators.get('withdrawalCredentials'),
+                    'withdrawableEpoch' : validators.get('withdrawableEpoch'),
+                    'totalIncome' : "N/A"
+                }
 
-                return common.send_sucess_msg(return_data)
+                return_data['currentBalance'] = balance
+                return_data['depositsReceived'] = deposits_Received
+                return_data['index'] = index
+                return_data['epoh'] = epoch
+
+            return common.send_sucess_msg(return_data, ** additional_data)
         else:
             return common.send_error_msg()
 
@@ -259,7 +285,7 @@ def get_validators_detail_by_public_key(pubkeyHex):
         error = common.get_error_traceback(sys,e)
         print (error)
         return common.send_error_msg()
-
+        
 def searchable_data(data):
     try: 
         check_data = data[:2]
