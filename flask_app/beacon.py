@@ -438,6 +438,9 @@ def get_slot_data(slot):
                 }
 
                 return_data['attestations_count'] = len(block_body.get('attestations'))
+                
+                epoch = get_epoch_by_slot(slot)
+                return_data['epoch'] = epoch
 
                 return_list.append(return_data)
 
@@ -565,4 +568,14 @@ def get_participation_rate():
         error = common.get_error_traceback(sys,e)
         print (error)
         return common.send_error_msg()
+
+
+
+def get_epoch_by_slot(slot):
+    db = mongo_helper.mongo_conn()
+    epoch_data = db.latest_block.find_one({'slot': int(slot)})
+    if epoch_data:
+        return epoch_data.get('epoch')
+    else:
+        return 'NA'
 
