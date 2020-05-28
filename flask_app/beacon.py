@@ -577,5 +577,9 @@ def get_epoch_by_slot(slot):
     if epoch_data:
         return epoch_data.get('epoch')
     else:
-        return 'NA'
-
+        epoch_data = db.latest_block.find_one({'slot': str(slot)})
+        if epoch_data:
+            return epoch_data.get('epoch')
+        else:
+            return 'NA'
+            

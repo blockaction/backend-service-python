@@ -43,8 +43,8 @@ def crawl_chain_head():
 
                         db_conn = mongo_helper.mongo_conn()
                         db_status = db_conn.latest_block.insert({
-                            'epoch' : int(current_epoch),
-                            'slot' : int(crawled_slot),
+                            'epoch' : str(current_epoch),
+                            'slot' : str(crawled_slot),
                             'proposer' : 'NA',
                             'attestian_count' : 0,
                             'status' : 'Skipped'
