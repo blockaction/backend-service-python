@@ -234,7 +234,7 @@ def get_validators_detail_by_public_key(pubkeyHex):
                 'GET',
                 url,
                 fields={
-                    'publicKeys' : pubkeyB64
+                    'publicKey' : pubkeyB64
                 } 
             )
 
@@ -247,7 +247,6 @@ def get_validators_detail_by_public_key(pubkeyHex):
                 balance =  int(balance_data.get('balance'))/1000000000
                 deposits_Received = int(balance_data.get('balance'))/1000000000
                 deposits_Received = str(round(deposits_Received, 0)) +" ETH"
-                balance = str(round(balance, 4)) +" ETH"
                 index = balance_data.get('index')
 
             uri = '/eth/v1alpha1/validator'
@@ -268,14 +267,15 @@ def get_validators_detail_by_public_key(pubkeyHex):
                     'slashed' : validators.get('slashed'),
                     'eligibilityEpoch' : validators.get('activationEligibilityEpoch'),
                     'withdrawalCredentials' : validators.get('withdrawalCredentials'),
-                    'withdrawableEpoch' : validators.get('withdrawableEpoch'),
-                    'totalIncome' : "N/A"
+                    'withdrawableEpoch' : validators.get('withdrawableEpoch')
+                    
                 }
 
                 return_data['currentBalance'] = balance
                 return_data['depositsReceived'] = deposits_Received
                 return_data['index'] = index
                 return_data['epoh'] = epoch
+                return_data['totalIncome'] = round(balance%32,5)
 
             return common.send_sucess_msg(return_data, ** additional_data)
         else:
@@ -285,6 +285,7 @@ def get_validators_detail_by_public_key(pubkeyHex):
         error = common.get_error_traceback(sys,e)
         print (error)
         return common.send_error_msg()
+
         
 def searchable_data(data):
     try: 
