@@ -520,9 +520,10 @@ def get_attestion_by_slot(args):
 def get_latest_block(args):
     '''gives data of latest block from db'''
     try :
-        count = int(args.get('count', 10))
+        page = int(args.get('page', 1))
+        perPage = int(args.get('perPage', 10))
         db_con = mongo_helper.mongo_conn()
-        db_data = db_con.latest_block.find({}).sort([('_id',-1)]).limit(count)
+        db_data = db_con.latest_block.find({}).sort([('_id',-1)]).limit(perPage)
         if not db_data:
             raise
 
