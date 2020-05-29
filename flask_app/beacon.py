@@ -350,7 +350,7 @@ def get_validators_detail_by_public_key(pubkeyHex):
             if validators.status == 200:
                 validators =  json.loads(validators.data.decode('UTF-8'))
                 additional_data = {
-                    # 'publicKey' : validators.get('publicKey'),
+                    'publicKey' : common.decode_public_key(validators.get('publicKey')),
                     'effectiveBalance' : str(int(validators.get('effectiveBalance'))/1000000000) + " ETH",
                     'slashed' : validators.get('slashed'),
                     'eligibilityEpoch' : validators.get('activationEligibilityEpoch'),
