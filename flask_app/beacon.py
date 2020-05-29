@@ -539,9 +539,12 @@ def get_slot_data(slot):
             block_container = slot_data.get('blockContainers')
             
             if len(block_container) == 0 :
+                epoch = get_epoch_by_slot(slot)
+
                 return_data = [{
                     'status' : 'skipped',
-                    'slot' : slot
+                    'slot' : slot,
+                    'epoch' : epoch
                 }]
 
                 return return_data
