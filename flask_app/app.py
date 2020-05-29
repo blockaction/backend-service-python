@@ -50,6 +50,11 @@ def get_validators_detail_by_public_kehiy(publicKey):
     return beacon.get_validators_detail_by_public_key(publicKey)
 
 
+@app.route('/api/validator/info/<int:index>')
+def get_validators_detail_by_index(index):
+    return beacon.get_validators_detail_by_index(index)
+
+
 @app.route('/api/getinfo/<data>')
 def get_info(data):
     return beacon.searchable_data(data)
