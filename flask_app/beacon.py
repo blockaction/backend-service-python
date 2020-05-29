@@ -392,17 +392,6 @@ def get_epoch_data(epoch_number):
         uri = '/eth/v1alpha1/beacon/blocks'
         url = base_url+uri
 
-
-        epoch_state = client_beacon_chain.GetChainHead()
-        if not epoch_state:
-            raise
-        finalized_epoch = int(epoch_state.finalized_epoch)
-
-        if int(epoch_number) <= finalized_epoch:
-            finnalized =  True
-        else:
-            finnalized = False
-
         response = http.request(
             'GET',
             url,
@@ -423,8 +412,7 @@ def get_epoch_data(epoch_number):
                 'blocks' : {
                     'proposed' : len(block_container),
                     'skipped' : 32 - len(block_container)
-                },
-                'finalized' : finnalized
+                }
             } 
             deposit_count = 0
             voluntry_exit_count = 0
@@ -456,53 +444,47 @@ def get_epoch_data(epoch_number):
             })
 
             
-            return common.send_sucess_msg(return_data)
+            # return common.send_sucess_msg(return_data)
 
-        # uri = '/eth/v1alpha1/validators/participation'
-        # url = base_url+uri
-        # response = http.request(
-        #     'GET',
-        #     url,
-        #     fields={
-        #         'epoch' : epoch_number
-        #     } 
-        # )
+        uri = '/eth/v1alpha1/validators/participation'
+        url = base_url+uri
+        response = http.request(
+            'GET',
+            url,
+            fields={
+                'epoch' : epoch_number
+            } 
+        )
 
-        # if response.status == 200:
-        #     data = json.loads(response.data.decode('UTF-8'))        
-        #     epoch = (data.get('epoch'))
-        #     finalized = str(data.get('finalized'))
-        #     voted_ether = int(data.get('participation').get('votedEther'))/1000000000
-        #     participation_rate = int(data.get('participation').get('globalParticipationRate'))
-        #     eligible_ether = int(data.get('participation').get('eligibleEther'))/1000000000
-        #     # validtor quee lenth
-        #     return_data = {
-        #         'epoch': epoch,
-        #         'finalized' :finalized,
-        #         'voted_ether': str(voted_ether),
-        #         'participation_rate' : str(participation_rate),
-        #         'eligible_ether' : str(eligible_ether)
-        #     }
+        if response.status == 200:
+            data = json.loads(response.data.decode('UTF-8'))        
+            return_data['finalized'] = data.get('finalized')            
+            voted_ether = float(data.get('participation').get('votedEther')) / 1000000000
+            participation_rate = float(data.get('participation').get('globalParticipationRate')) * 100
+            eligible_ether = float(data.get('participation').get('eligibleEther'))/1000000000
 
-        #     #  Total Validator Count
-        # uri = '/eth/v1alpha1/validators'
-        # url = base_url+uri
-        # validators = http.request(
-        #     'GET',
-        #     url,
-        #     fields={
-        #         'epoch' : epoch_number                         
-        #     } 
-        # )
+        return_data.update({
+            'voted_ether' : voted_ether,
+            'participation_rate' : participation_rate,
+            'eligible_ether' : eligible_ether
+        })
 
-        # if validators.status == 200:
-        #     validators =  json.loads(validators.data.decode('UTF-8'))
-        #     total_data = {
-        #         'total_validator_count' : str(validators.get('totalSize'))
-        #     }
+        uri = '/eth/v1alpha1/validators'
+        url = base_url+uri
+        validators = http.request(
+            'GET',
+            url,
+            fields={
+                'epoch' : epoch_number                         
+            } 
+        )
+
+        if validators.status == 200:
+            validators =  json.loads(validators.data.decode('UTF-8'))
+            return_data['validator_count'] : str(validators.get('totalSize'))
                 
         
-        # return common.send_sucess_msg(return_data, **pending_data, **total_data)
+        return common.send_sucess_msg(return_data)
 
         # else:
         #     return common.send_error_msg()
