@@ -322,7 +322,7 @@ def get_validators_detail_by_public_key(pubkeyHex):
                 'GET',
                 url,
                 fields={
-                    'publicKey' : pubkeyB64
+                    'publicKeys' : pubkeyB64
                 } 
             )
 
