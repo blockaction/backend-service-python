@@ -301,65 +301,123 @@ def searchable_data(data):
 
 def get_epoch_data(epoch_number):
     try:
-
-        uri = '/eth/v1alpha1/validators/participation'
+        uri = '/eth/v1alpha1/beacon/blocks'
         url = base_url+uri
+
+
+        epoch_state = client_beacon_chain.GetChainHead()
+        if not epoch_state:
+            raise
+        finalized_epoch = int(epoch_state.finalized_epoch)
+
+        if int(epoch_number) <= finalized_epoch:
+            finnalized =  True
+        else:
+            finnalized = False
+
         response = http.request(
             'GET',
             url,
             fields={
-                'epoch_number' : str(epoch_number)           
+                'epoch' : str(epoch_number)           
             } 
-        )
+        )        
 
+        
         if response.status == 200:
-            data = json.loads(response.data.decode('UTF-8'))        
-            epoch = (data.get('epoch'))
-            finalized = str(data.get('finalized'))
-            voted_ether = int(data.get('participation').get('votedEther'))/1000000000
-            participation_rate = int(data.get('participation').get('globalParticipationRate'))
-            eligible_ether = int(data.get('participation').get('eligibleEther'))/1000000000
-            # validtor quee lenth
+            block_data_ = json.loads(response.data.decode('UTF-8')) 
+            block_container = block_data_.get('blockContainers')
+
+            return_list = []
+
             return_data = {
-                'epoch': epoch,
-                'finalized' :finalized,
-                'voted_ether': str(voted_ether),
-                'participation_rate' : str(participation_rate),
-                'eligible_ether' : str(eligible_ether)
-            }
+                'epoch' : epoch_number,
+                'blocks' : {
+                    'proposed' : len(block_container),
+                    'skipped' : 32 - len(block_container)
+                },
+                'finalized' : finnalized
+            } 
+            deposit_count = 0
+            voluntry_exit_count = 0
+            attester_slashing_count = 0
+            proposer_slashing_count = 0
+            attestations_count = 0
 
-            #  Total Validator Count
-            uri = '/eth/v1alpha1/validators'
-            url = base_url+uri
-            validators = http.request(
-                'GET',
-                url,
-                fields={
-                    'epoch' : epoch_number                         
-                } 
-            )
+            for single_block_data in block_container:
+               
+                block_data = single_block_data.get('block')
+                block_detail = block_data.get('block')
+                block_body = block_detail.get('body')
 
-            if validators.status == 200:
-                validators =  json.loads(validators.data.decode('UTF-8'))
-                total_data = {
-                    'total_validator_count' : str(validators.get('totalSize'))
-                }
+                deposit_count = deposit_count + len(block_body.get('deposits'))
+                voluntry_exit_count = voluntry_exit_count + len(block_body.get('voluntaryExits'))
+                attester_slashing_count =  attester_slashing_count + len(block_body.get('attesterSlashings'))
+                proposer_slashing_count = proposer_slashing_count + len(block_body.get('proposerSlashings'))
+                attestations_count = attestations_count + len(block_body.get('attestations'))
 
-        #  Pending Count
-            uri = '/eth/v1alpha1/validators/queue'
-            url = base_url+uri
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = response.content.decode('UTF-8')
-                data = common.parse_dictionary(data)
-                pending_data = {
 
-                    'pending_count' : str(len(data.get('activationPublicKeys')))
-                } 
+            return_data.update({
+                'deposits' : deposit_count,
+                'voluntay_exists' : voluntry_exit_count,
+                'slashing' : {
+                    'proposer_slashing' : proposer_slashing_count,
+                    'attester_slashing' : attester_slashing_count
+                },
+                'attestations' : attestations_count
+            })
+
+            
+            return common.send_sucess_msg(return_data)
+
+        # uri = '/eth/v1alpha1/validators/participation'
+        # url = base_url+uri
+        # response = http.request(
+        #     'GET',
+        #     url,
+        #     fields={
+        #         'epoch' : epoch_number
+        #     } 
+        # )
+
+        # if response.status == 200:
+        #     data = json.loads(response.data.decode('UTF-8'))        
+        #     epoch = (data.get('epoch'))
+        #     finalized = str(data.get('finalized'))
+        #     voted_ether = int(data.get('participation').get('votedEther'))/1000000000
+        #     participation_rate = int(data.get('participation').get('globalParticipationRate'))
+        #     eligible_ether = int(data.get('participation').get('eligibleEther'))/1000000000
+        #     # validtor quee lenth
+        #     return_data = {
+        #         'epoch': epoch,
+        #         'finalized' :finalized,
+        #         'voted_ether': str(voted_ether),
+        #         'participation_rate' : str(participation_rate),
+        #         'eligible_ether' : str(eligible_ether)
+        #     }
+
+        #     #  Total Validator Count
+        # uri = '/eth/v1alpha1/validators'
+        # url = base_url+uri
+        # validators = http.request(
+        #     'GET',
+        #     url,
+        #     fields={
+        #         'epoch' : epoch_number                         
+        #     } 
+        # )
+
+        # if validators.status == 200:
+        #     validators =  json.loads(validators.data.decode('UTF-8'))
+        #     total_data = {
+        #         'total_validator_count' : str(validators.get('totalSize'))
+        #     }
                 
-            return common.send_sucess_msg(return_data, **pending_data, **total_data)
-        else:
-            return common.send_error_msg()
+        
+        # return common.send_sucess_msg(return_data, **pending_data, **total_data)
+
+        # else:
+        #     return common.send_error_msg()
 
     except Exception as e:
         error = common.get_error_traceback(sys,e)
