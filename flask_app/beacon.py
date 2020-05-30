@@ -389,6 +389,17 @@ def searchable_data(data):
 
 def get_epoch_data(epoch_number):
     try:
+        epoch_state = client_beacon_chain.GetChainHead()
+        if not epoch_state:
+            raise
+        finalized_epoch = int(epoch_state.finalized_epoch)
+
+        if int(epoch_number) <= finalized_epoch:
+            finnalized =  True
+        else:
+            finnalized = False
+
+
         uri = '/eth/v1alpha1/beacon/blocks'
         url = base_url+uri
 
@@ -443,18 +454,22 @@ def get_epoch_data(epoch_number):
                 'attestations' : attestations_count
             })
 
-            
-            # return common.send_sucess_msg(return_data)
-
         uri = '/eth/v1alpha1/validators/participation'
         url = base_url+uri
-        response = http.request(
-            'GET',
-            url,
-            fields={
-                'epoch' : epoch_number
-            } 
-        )
+        if not finnalized:
+            response = http.request(
+                'GET',
+                url
+            )
+        else:
+            response = http.request(
+                        'GET',
+                        url,
+                        fields={
+                            'epoch' : epoch_number
+                        }                         
+                    )            
+
 
         if response.status == 200:
             data = json.loads(response.data.decode('UTF-8'))        
