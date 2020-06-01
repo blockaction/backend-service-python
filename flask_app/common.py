@@ -19,9 +19,13 @@ def get_config():
 def api():
     # base_url = "https://api.prylabs.net"
     # base_url = 'http://34.229.64.192:4001'  #topaz
-    base_url = 'http://35.172.121.212:4001' #witty
+    # base_url = 'http://35.172.121.212:4001' #witty
     base_url = 'http://3.236.9.194:4001' #witty test
     return base_url
+
+def genesis_time():
+    genesis_epoch_utc = 1590537600 #for witti 
+    return genesis_epoch_utc
 
 
 def send_error_msg(): 

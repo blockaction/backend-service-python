@@ -3,6 +3,7 @@ from .import node
 from client import client_beacon_chain
 from flask_app import common 
 from flask_app.models import mongo_helper
+from flask_app.app_helper import time_calculator
 import json 
 import requests
 import chardet
@@ -416,10 +417,12 @@ def get_epoch_data(epoch_number):
             block_data_ = json.loads(response.data.decode('UTF-8')) 
             block_container = block_data_.get('blockContainers')
 
+            epoch_time = time_calculator.get_epoch_time(int(epoch_number))
             return_list = []
 
             return_data = {
                 'epoch' : epoch_number,
+                'time' : epoch_time,
                 'blocks' : {
                     'proposed' : len(block_container),
                     'skipped' : 32 - len(block_container)
@@ -528,7 +531,7 @@ def get_slot_data(slot):
             'GET',
             url,
             fields={
-                'slot' : slot          
+                'slot' : slot
             } 
         )
 
@@ -536,6 +539,9 @@ def get_slot_data(slot):
             slot_data = response.data.decode('UTF-8')
             slot_data = common.parse_dictionary(slot_data)
             block_container = slot_data.get('blockContainers')
+
+            slot_time = time_calculator.get_slot_time(slot)
+           
             
             if len(block_container) == 0 :
                 epoch = get_epoch_by_slot(slot)
@@ -543,7 +549,8 @@ def get_slot_data(slot):
                 return_data = [{
                     'status' : 'skipped',
                     'slot' : slot,
-                    'epoch' : epoch
+                    'epoch' : epoch,
+                    'time' : slot_time
                 }]
 
                 return return_data
@@ -551,7 +558,8 @@ def get_slot_data(slot):
             return_list = []
             for single_block_data in block_container:
                 return_data = {
-                    'status' : 'proposed'
+                    'status' : 'proposed',
+                    'time' : slot_time
                 }
                 return_data['block_root'] =  common.decode_public_key(single_block_data.get('blockRoot'))
                 block_data = single_block_data.get('block')
