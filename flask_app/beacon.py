@@ -496,9 +496,11 @@ def get_epoch_data(epoch_number):
 
         if validators.status == 200:
             validators =  json.loads(validators.data.decode('UTF-8'))
-            return_data['validator_count'] : str(validators.get('totalSize'))
-                
-        
+
+            count = {
+                'validator_count' : str(validators.get('totalSize'))
+            }
+            return_data.update(count)
         return common.send_sucess_msg(return_data)
 
         # else:
