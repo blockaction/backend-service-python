@@ -111,6 +111,7 @@ def get_validators_api(args):
                 pkB64 = pk.get('publicKey')
                 pkHex = common.decode_public_key(pkB64)
                 pk['publicKey'] = pkHex
+                pk['effectiveBalance'] = float(pk.get('effectiveBalance')) / 1000000000
                 data['validator'] = pk
 
 
@@ -694,7 +695,10 @@ def get_latest_block(args):
             }
             return_dict['epoch'] = data.get('epoch','NA')
             return_dict['slot'] = data.get('slot','NA')
-            return_dict['proposer'] = data.get('proposer','NA')
+            if not (data.get('slot') == 'NA'):
+                return_dict['time'] = time_calculator.get_slot_time(data.get('slot'))
+
+            return_dict['proposer'] = data.get('proposer','N/A')
             return_dict['attestian_count'] = data.get('attestian_count','NA')
             return_dict['status'] = data.get('status','NA')
             return_list.append(return_dict)
